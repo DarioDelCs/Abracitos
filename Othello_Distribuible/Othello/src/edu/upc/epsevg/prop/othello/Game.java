@@ -25,7 +25,7 @@ public class Game {
             @Override
             public void run() {
                 
-                IPlayer player1 = new Abracitos("Abracitos");
+                IPlayer player1 = new Abracitos();
                 //IPlayer player1 = new HumanPlayer("Human1");
                 IPlayer player2 = new DesdemonaPlayer(1);//GB
 

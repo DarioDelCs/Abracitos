@@ -19,7 +19,7 @@ public class Abracitos implements IPlayer, IAuto {
     private GameStatus s;
 
     public Abracitos() {
-        this.name = "Abracitos";
+        this.name = "puto";
     }
 
     @Override

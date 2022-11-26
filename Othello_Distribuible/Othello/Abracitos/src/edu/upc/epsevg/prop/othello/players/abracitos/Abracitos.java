@@ -1,5 +1,6 @@
 package edu.upc.epsevg.prop.othello.players.abracitos;
 
+import edu.upc.epsevg.prop.othello.CellType;
 import edu.upc.epsevg.prop.othello.GameStatus;
 import edu.upc.epsevg.prop.othello.IAuto;
 import edu.upc.epsevg.prop.othello.IPlayer;
@@ -7,7 +8,6 @@ import edu.upc.epsevg.prop.othello.Move;
 import edu.upc.epsevg.prop.othello.SearchType;
 import java.awt.Point;
 import java.util.ArrayList;
-import java.util.Random;
 
 /**
  *
@@ -16,15 +16,32 @@ import java.util.Random;
 public class Abracitos implements IPlayer, IAuto {
 
     private String name;
-    private GameStatus s;
+    private int heur;
+    
+    private CellType jugador = null;
+    private CellType jugador_enemic = null;
+    private boolean timeout = false;
+    private int profunditat;
+    private long nodes;
+    
+    private final int[][] taula_heur = {
+        {100, -20, 10, 5, 5, 10, -20, 100},
+        {-20, -50, -2,-2,-2, -2, -50, -20},
+        {10 , -2 , -1,-1,-1, -1, -2 ,  10},
+        {5  , -2 , -1,-1,-1, -1, -2 ,   5},
+        {5  , -2 , -1,-1,-1, -1, -2 ,   5},
+        {10 , -2 , -1,-1,-1, -1, -2 ,  10},
+        {-20, -50, -2,-2,-2, -2, -50, -20},
+        {100, -20, 10, 5, 5, 10, -20, 100}
+    };
 
     public Abracitos() {
-        this.name = "puto";
+        this.name = "Abracitos";
     }
 
     @Override
     public void timeout() {
-        // Nothing to do! I'm so fast, I never timeout 8-)
+        timeout = true;
     }
 
     /**
@@ -36,16 +53,18 @@ public class Abracitos implements IPlayer, IAuto {
      */
     @Override
     public Move move(GameStatus s) {
-
+        if(this.jugador == null){
+            jugador = s.getCurrentPlayer();
+            jugador_enemic = (jugador == CellType.PLAYER1 ? CellType.PLAYER2 : CellType.PLAYER1);
+        }
+        
         ArrayList<Point> moves =  s.getMoves();
         if(moves.isEmpty())
         {
             // no podem moure, el moviment (de tipus Point) es passa null.
-            return new Move(null, 0L,0,  SearchType.RANDOM); 
+            return new Move(null, 0L, 0,  SearchType.MINIMAX);
         } else {
-            Random rand = new Random();
-            int q = rand.nextInt(moves.size());
-            return new Move( moves.get(q), 0L, 0, SearchType.RANDOM);         
+            return novaTirada(s, moves);
         }
     }
 
@@ -58,38 +77,39 @@ public class Abracitos implements IPlayer, IAuto {
         return name;
     }
     
-        public int nova_tirada(Tauler t, int profunditat) {
-        this.heur = 0;
+    public Move novaTirada(GameStatus gs, ArrayList<Point> moves) {
         int millor_heur = Integer.MIN_VALUE;
-        int millor_columna = -1;
-        for (int i = 0; i < t.getMida(); i++) {
+        Move millor_tirada = null;
+        this.heur = 0;
+        this.profunditat = 0;
+        this.nodes = 0;
+        
+        for (int i = 0; i < moves.size(); i++) {
             int alpha = Integer.MIN_VALUE;
-            if (t.movpossible(i)) {
-                Tauler tauler_aux = new Tauler(t);
-                tauler_aux.afegeix(i, this.color);
-                if (!tauler_aux.solucio(i, this.color)) {
-                    //Descomentar si es vol sense poda
-                    //alpha = minimitza(tauler_aux, profunditat - 1);
+            
+            GameStatus game_aux = new GameStatus(gs);
+            game_aux.movePiece(moves.get(i));
+            
+            if (game_aux.isGameOver()) {
+                if(game_aux.GetWinner() == jugador){
                     
-                    //Comentar si es vol sense poda
-                    alpha = minimitza(tauler_aux, profunditat - 1, millor_heur, Integer.MAX_VALUE);
-                    
-                    if (alpha > millor_heur || millor_columna == -1) {
-                        millor_columna = i;
-                        millor_heur = alpha;
-                    }
+                    System.out.println("pos win: " + moves.get(i));
+                    return new Move(moves.get(i), nodes, profunditat,  SearchType.MINIMAX);
                 }
-                else {
-                    return i;
+                
+            } else {
+                alpha = minimitza(game_aux, 1, millor_heur, Integer.MAX_VALUE);
+
+                if (alpha > millor_heur || millor_tirada == null) {
+                    millor_tirada = new Move(moves.get(i), nodes, profunditat,  SearchType.MINIMAX);
+                    millor_heur = alpha;
                 }
             }
-         }
-        this.heur += this.result_heur;
-        System.out.println("Heuristica de la tirada "+this.num_tirades+": "+this.heur);
-        return millor_columna;
+        }
+        
+        System.out.println("pos fin: " + millor_tirada.getTo());
+        return millor_tirada;
     }
-    
-
     
     /**
      * Funcion que ens indica l'heuristica mes gran trobada per totes les tirades analitzades.
@@ -99,43 +119,38 @@ public class Abracitos implements IPlayer, IAuto {
      * @param beta valor heuristic mes baix trobat fins al moment per fer la poda
      * @return retorna la heuristica mes alta de totes les tirades analitzades
      */
-    
-    //Descomentar si es vol sense poda
-    //public int maximitza (Tauler t,int profunditat){
-    //Comentar si es vol sense poda
-    public int maximitza (Tauler t,int profunditat,int alpha,int beta){
-        if (profunditat <= 0 || !(t.espotmoure())) {
-            return heur(t);
+    public int maximitza (GameStatus gs, int profunditat, int alpha, int beta){
+        ArrayList<Point> moves =  gs.getMoves();
+        if (timeout || moves.isEmpty()) {
+            if(this.profunditat < profunditat){
+                this.profunditat = profunditat;
+            }
+            return heur(gs);
         }
         
         int nova_alpha = Integer.MIN_VALUE;
-        for (int i = 0; i < t.getMida(); i++) {
-            if (t.movpossible(i)) {
-                Tauler taulell_aux = new Tauler(t);
-                taulell_aux.afegeix(i, this.color);
-                if (!taulell_aux.solucio(i, this.color)) {
-                    //Descomentar si es vol sense poda
-                    //nova_alpha = Math.max(nova_alpha, minimitza(taulell_aux, profunditat - 1));
-                    
-                    //---Comentar si es vol sense poda-----------------
-                    
-                    nova_alpha = Math.max(nova_alpha, minimitza(taulell_aux, profunditat - 1, alpha, beta));
-                    alpha = Math.max(nova_alpha, alpha);
-                    if (alpha >= beta) {
-                        return alpha;
-                    }
-
-                    //-------------------------------------------------
-                }
-                else {
+        for (int i = 0; i < moves.size(); i++) {
+            
+            GameStatus game_aux = new GameStatus(gs);
+            game_aux.movePiece(moves.get(i));
+            if (game_aux.isGameOver()) {
+                if(game_aux.GetWinner() == jugador){
                     return Integer.MAX_VALUE;
+                }
+                
+            } else {
+                nova_alpha = Math.max(nova_alpha, minimitza(game_aux, profunditat + 1, alpha, beta));
+                alpha = Math.max(nova_alpha, alpha);
+                if (alpha >= beta) {
+                    return alpha;
                 }
             }
         }
+        
         return nova_alpha;
     }
     
-     /**
+    /**
      * Funcion que ens indica l'heuristica mes petita trobada per totes les tirades analitzades.
      * @param t taulell sobre el que s'esta jugant
      * @param profunditat profunditat fins la que s'explorara l'arbre de posibilitats
@@ -143,37 +158,53 @@ public class Abracitos implements IPlayer, IAuto {
      * @param beta valor heuristic mes baix trobat fins al moment per fer la poda
      * @return retorna la heuristica mes baixa de totes les tirades analitzades
      */
-    //Descomentar si es vol sense poda
-    //public int minimitza (Tauler t,int profunditat){
-    //Comentar si es vol sense poda
-    public int minimitza (Tauler t,int profunditat,int alpha,int beta){
-        if (profunditat <= 0 || !(t.espotmoure())) {
-            return heur(t);
+    public int minimitza (GameStatus gs, int profunditat, int alpha, int beta){
+        ArrayList<Point> moves =  gs.getMoves();
+        if (timeout || moves.isEmpty()) {
+            if(this.profunditat < profunditat){
+                this.profunditat = profunditat;
+            }
+            return heur(gs);
         }
+        
         int nova_beta = Integer.MAX_VALUE;
-        for (int i = 0; i < t.getMida(); i++) {
-            if (t.movpossible(i)) {
-                Tauler taulell_aux = new Tauler(t);
-                taulell_aux.afegeix(i, this.color*-1);
-                if (!taulell_aux.solucio(i, this.color*-1)) {
-                    //Descomentar si es vol sense poda
-                    //nova_beta = Math.min(nova_beta, maximitza(taulell_aux, profunditat - 1));
-                    
-                    //---Comentar si es vol sense poda-----------------
-                    
-                    nova_beta = Math.min(nova_beta, maximitza(taulell_aux, profunditat - 1, alpha, beta));
-                    beta = Math.min(nova_beta, beta);
-                    if (alpha >= beta) {
-                        return beta;
-                    }
-
-                    //-------------------------------------------------
-                }
-                else {
+        for (int i = 0; i < moves.size(); i++) {
+            
+            GameStatus game_aux = new GameStatus(gs);
+            game_aux.movePiece(moves.get(i));
+            if (game_aux.isGameOver()) {
+                if(game_aux.GetWinner() == jugador_enemic){
                     return Integer.MIN_VALUE;
+                }
+                
+            } else {
+                nova_beta = Math.min(nova_beta, maximitza(game_aux, profunditat + 1, alpha, beta));
+                beta = Math.min(nova_beta, beta);
+                if (alpha >= beta) {
+                    return beta;
                 }
             }
         }
+        
         return nova_beta;
     }
+    
+    public int heur(GameStatus gs) {
+        int puntuacio = 0;
+        int size = gs.getSize();
+        
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                if (gs.getPos(i, j) == this.jugador) {
+                    puntuacio += taula_heur[i][j];
+                } else if (gs.getPos(i, j) == this.jugador_enemic) {
+                    puntuacio -= taula_heur[i][j];
+                }
+            }
+        }
+        
+        return puntuacio + gs.getScore(jugador) - gs.getScore(jugador_enemic);
+    }
+    //https://play-othello.appspot.com/files/Othello.pdf
+    //si el enemigo tiene menos movimientos deberia aumentar la heuristica
 }

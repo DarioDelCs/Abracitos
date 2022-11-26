@@ -30,7 +30,7 @@ public class Game {
                 IPlayer player2 = new DesdemonaPlayer(1);//GB
 
                                 
-                new Board(player1 , player2, 2, false);
+                new Board(player1 , player2, 2, true);
              }
         });
     }

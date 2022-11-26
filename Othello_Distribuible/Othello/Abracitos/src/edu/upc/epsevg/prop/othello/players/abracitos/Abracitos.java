@@ -190,6 +190,7 @@ public class Abracitos implements IPlayer, IAuto {
     }
     
     public int heur(GameStatus gs) {
+        nodes++;
         int puntuacio = 0;
         int size = gs.getSize();
         
@@ -203,7 +204,7 @@ public class Abracitos implements IPlayer, IAuto {
             }
         }
         
-        return puntuacio + gs.getScore(jugador) - gs.getScore(jugador_enemic);
+        return puntuacio + gs.getScore(jugador)*5 - gs.getScore(jugador_enemic)*5;
     }
     //https://play-othello.appspot.com/files/Othello.pdf
     //si el enemigo tiene menos movimientos deberia aumentar la heuristica

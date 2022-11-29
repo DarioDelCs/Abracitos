@@ -21,6 +21,7 @@ public class Abracitos implements IPlayer, IAuto {
     private CellType jugador = null;
     private CellType jugador_enemic = null;
     private boolean timeout = false;
+    private int maxima_profunditat;
     private int profunditat;
     private long nodes;
     
@@ -45,12 +46,14 @@ public class Abracitos implements IPlayer, IAuto {
         {100, 0, 0, 0, 0, 0, 0, 100}
     };*/
 
-    public Abracitos() {
+    public Abracitos(int profunditat) {
         this.name = "Abracitos";
+        this.profunditat = profunditat;
     }
 
     @Override
     public void timeout() {
+        System.out.println("TIMEOUT");
         this.timeout = true;
     }
 
@@ -91,9 +94,9 @@ public class Abracitos implements IPlayer, IAuto {
         int millor_heur = Integer.MIN_VALUE;
         Move millor_tirada = new Move(moves.get(0), 0L, 0,  SearchType.MINIMAX);
         this.heur = 0;
-        this.profunditat = 0;
         this.nodes = 0;
         this.timeout = false;
+        maxima_profunditat = -1;
         
         for (int i = 0; i < moves.size(); i++) {
             int alpha = Integer.MIN_VALUE;
@@ -105,14 +108,14 @@ public class Abracitos implements IPlayer, IAuto {
                 if(game_aux.GetWinner() == jugador){
                     
                     System.out.println("pos win: " + moves.get(i));
-                    return new Move(moves.get(i), nodes, profunditat,  SearchType.MINIMAX);
+                    return new Move(moves.get(i), nodes, maxima_profunditat,  SearchType.MINIMAX);
                 }
                 
             } else {
-                alpha = minimitza(game_aux, 1, millor_heur, Integer.MAX_VALUE);
+                alpha = minimitza(game_aux, profunditat, millor_heur, Integer.MAX_VALUE);
 
                 if (alpha > millor_heur || millor_tirada == null) {
-                    millor_tirada = new Move(moves.get(i), nodes, profunditat,  SearchType.MINIMAX);
+                    millor_tirada = new Move(moves.get(i), nodes, maxima_profunditat,  SearchType.MINIMAX);
                     millor_heur = alpha;
                 }
             }
@@ -131,10 +134,7 @@ public class Abracitos implements IPlayer, IAuto {
      */
     public int maximitza (AbracitosGame gs, int profunditat, int alpha, int beta){
         ArrayList<Point> moves =  gs.getMoves();
-        if (timeout || moves.isEmpty()) {
-            if(this.profunditat < profunditat){
-                this.profunditat = profunditat;
-            }
+        if (timeout || moves.isEmpty() || profunditat == 0) {
             return heur(gs);
         }
         
@@ -149,7 +149,7 @@ public class Abracitos implements IPlayer, IAuto {
                 }
                 
             } else {
-                nova_alpha = Math.max(nova_alpha, minimitza(game_aux, profunditat + 1, alpha, beta));
+                nova_alpha = Math.max(nova_alpha, minimitza(game_aux, profunditat - 1, alpha, beta));
                 alpha = Math.max(nova_alpha, alpha);
                 if (alpha >= beta) {
                     return alpha;
@@ -170,10 +170,7 @@ public class Abracitos implements IPlayer, IAuto {
      */
     public int minimitza (AbracitosGame gs, int profunditat, int alpha, int beta){
         ArrayList<Point> moves =  gs.getMoves();
-        if (timeout || moves.isEmpty()) {
-            if(this.profunditat < profunditat){
-                this.profunditat = profunditat;
-            }
+        if (timeout || moves.isEmpty() || profunditat == 0) {
             return heur(gs);
         }
         
@@ -188,7 +185,7 @@ public class Abracitos implements IPlayer, IAuto {
                 }
                 
             } else {
-                nova_beta = Math.min(nova_beta, maximitza(game_aux, profunditat + 1, alpha, beta));
+                nova_beta = Math.min(nova_beta, maximitza(game_aux, profunditat - 1, alpha, beta));
                 beta = Math.min(nova_beta, beta);
                 if (alpha >= beta) {
                     return beta;

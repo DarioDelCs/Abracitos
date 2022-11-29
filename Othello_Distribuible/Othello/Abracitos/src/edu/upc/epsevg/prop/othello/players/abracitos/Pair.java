@@ -15,7 +15,7 @@ public class Pair {
 
     //en caso de que encuentre dos opciones ganadoras o perdedoras, le dara igual por que rama ir, cuando alomejor si la heuristica anterior era superior en una rama, habra mas opciones de que llegamos a ganar por esa rama
     //tabla heuristica deberia ser dinamica? porque sino al tener una esquina, justo el lado lo tenemos con numeros muy bajos cuando deberian ser muy altos
-    //la produndidad es 1, es normal?
+    //deberia ser dinamica o simplemente quitar la tabla al estar avanzados
     public Pair(int heur, boolean win) {
         this.heur = heur;
         this.win = win;

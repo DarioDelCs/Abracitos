@@ -24,7 +24,7 @@ public class Abracitos implements IPlayer, IAuto {
     private int profunditat;
     private long nodes;
     
-    private final int[][] taula_heur = {
+    /*private final int[][] taula_heur = {
         {100, -20, 10, 5, 5, 10, -20, 100},
         {-20, -50, -2,-2,-2, -2, -50, -20},
         {10 , -2 , -1,-1,-1, -1, -2 ,  10},
@@ -33,7 +33,17 @@ public class Abracitos implements IPlayer, IAuto {
         {10 , -2 , -1,-1,-1, -1, -2 ,  10},
         {-20, -50, -2,-2,-2, -2, -50, -20},
         {100, -20, 10, 5, 5, 10, -20, 100}
-    };
+    };*/
+    /*private final int[][] taula_heur = {
+        {100, 0, 0, 0, 0, 0, 0, 100},
+        {0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0},
+        {0, 0, 0, 0, 0, 0, 0, 0},
+        {100, 0, 0, 0, 0, 0, 0, 100}
+    };*/
 
     public Abracitos() {
         this.name = "Abracitos";
@@ -41,7 +51,7 @@ public class Abracitos implements IPlayer, IAuto {
 
     @Override
     public void timeout() {
-        timeout = true;
+        this.timeout = true;
     }
 
     /**
@@ -64,7 +74,7 @@ public class Abracitos implements IPlayer, IAuto {
             // no podem moure, el moviment (de tipus Point) es passa null.
             return new Move(null, 0L, 0,  SearchType.MINIMAX);
         } else {
-            return novaTirada(s, moves);
+            return novaTirada(new AbracitosGame(s), moves);
         }
     }
 
@@ -77,17 +87,18 @@ public class Abracitos implements IPlayer, IAuto {
         return name;
     }
     
-    public Move novaTirada(GameStatus gs, ArrayList<Point> moves) {
+    public Move novaTirada(AbracitosGame gs, ArrayList<Point> moves) {
         int millor_heur = Integer.MIN_VALUE;
-        Move millor_tirada = null;
+        Move millor_tirada = new Move(moves.get(0), 0L, 0,  SearchType.MINIMAX);
         this.heur = 0;
         this.profunditat = 0;
         this.nodes = 0;
+        this.timeout = false;
         
         for (int i = 0; i < moves.size(); i++) {
             int alpha = Integer.MIN_VALUE;
             
-            GameStatus game_aux = new GameStatus(gs);
+            AbracitosGame game_aux = new AbracitosGame(gs);
             game_aux.movePiece(moves.get(i));
             
             if (game_aux.isGameOver()) {
@@ -107,7 +118,6 @@ public class Abracitos implements IPlayer, IAuto {
             }
         }
         
-        System.out.println("pos fin: " + millor_tirada.getTo());
         return millor_tirada;
     }
     
@@ -119,7 +129,7 @@ public class Abracitos implements IPlayer, IAuto {
      * @param beta valor heuristic mes baix trobat fins al moment per fer la poda
      * @return retorna la heuristica mes alta de totes les tirades analitzades
      */
-    public int maximitza (GameStatus gs, int profunditat, int alpha, int beta){
+    public int maximitza (AbracitosGame gs, int profunditat, int alpha, int beta){
         ArrayList<Point> moves =  gs.getMoves();
         if (timeout || moves.isEmpty()) {
             if(this.profunditat < profunditat){
@@ -131,7 +141,7 @@ public class Abracitos implements IPlayer, IAuto {
         int nova_alpha = Integer.MIN_VALUE;
         for (int i = 0; i < moves.size(); i++) {
             
-            GameStatus game_aux = new GameStatus(gs);
+            AbracitosGame game_aux = new AbracitosGame(gs);
             game_aux.movePiece(moves.get(i));
             if (game_aux.isGameOver()) {
                 if(game_aux.GetWinner() == jugador){
@@ -158,7 +168,7 @@ public class Abracitos implements IPlayer, IAuto {
      * @param beta valor heuristic mes baix trobat fins al moment per fer la poda
      * @return retorna la heuristica mes baixa de totes les tirades analitzades
      */
-    public int minimitza (GameStatus gs, int profunditat, int alpha, int beta){
+    public int minimitza (AbracitosGame gs, int profunditat, int alpha, int beta){
         ArrayList<Point> moves =  gs.getMoves();
         if (timeout || moves.isEmpty()) {
             if(this.profunditat < profunditat){
@@ -170,7 +180,7 @@ public class Abracitos implements IPlayer, IAuto {
         int nova_beta = Integer.MAX_VALUE;
         for (int i = 0; i < moves.size(); i++) {
             
-            GameStatus game_aux = new GameStatus(gs);
+            AbracitosGame game_aux = new AbracitosGame(gs);
             game_aux.movePiece(moves.get(i));
             if (game_aux.isGameOver()) {
                 if(game_aux.GetWinner() == jugador_enemic){
@@ -189,10 +199,59 @@ public class Abracitos implements IPlayer, IAuto {
         return nova_beta;
     }
     
-    public int heur(GameStatus gs) {
+    public int heur(AbracitosGame gs) {
         nodes++;
         int puntuacio = 0;
         int size = gs.getSize();
+        int[][] taula_heur = {
+            { 4, -3, 2, 2, 2, 2, -3, 4},
+            {-3, -4,-1,-1,-1,-1, -4,-3},
+            { 2, -1, 1, 0, 0, 1, -1, 2},
+            { 2, -1, 0, 1, 1, 0, -1, 2},
+            { 2, -1, 0, 1, 1, 0, -1, 2},
+            { 2, -1, 1, 0, 0, 1, -1, 2},
+            {-3, -4,-1,-1,-1,-1, -4,-3},
+            { 4, -3, 2, 2, 2, 2, -3, 4}
+        };
+        
+        int player_corners = 0;
+        int enemy_corners = 0;
+        if (gs.getPos(0, 0) == this.jugador) {
+            player_corners++;
+            taula_heur[0][1] = 4;
+            taula_heur[1][0] = 4;
+        } else if (gs.getPos(0, 0) == this.jugador_enemic) {
+            enemy_corners++;
+            taula_heur[0][1] = 4;
+            taula_heur[1][0] = 4;
+        }
+        if (gs.getPos(0, 7) == this.jugador) {
+            player_corners++;
+            taula_heur[0][6] = 4;
+            taula_heur[1][7] = 4;
+        } else if (gs.getPos(0, 7) == this.jugador_enemic) {
+            enemy_corners++;
+            taula_heur[0][6] = 4;
+            taula_heur[1][7] = 4;
+        }
+        if (gs.getPos(7, 0) == this.jugador) {
+            player_corners++;
+            taula_heur[7][1] = 4;
+            taula_heur[6][0] = 4;
+        } else if (gs.getPos(7, 0) == this.jugador_enemic) {
+            enemy_corners++;
+            taula_heur[7][1] = 4;
+            taula_heur[6][0] = 4;
+        }
+        if (gs.getPos(7, 7) == this.jugador) {
+            player_corners++;
+            taula_heur[6][7] = 4;
+            taula_heur[7][6] = 4;
+        } else if (gs.getPos(7, 7) == this.jugador_enemic) {
+            enemy_corners++;
+            taula_heur[6][7] = 4;
+            taula_heur[7][6] = 4;
+        }
         
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
@@ -204,7 +263,24 @@ public class Abracitos implements IPlayer, IAuto {
             }
         }
         
-        return puntuacio + gs.getScore(jugador)*5 - gs.getScore(jugador_enemic)*5;
+        //heuristica de corners
+        if(player_corners + enemy_corners != 0){
+            puntuacio += 100 * (player_corners - enemy_corners) / (player_corners + enemy_corners);
+        }
+        
+        //heuristica mobility
+        int player_moves = gs.getMoves().size();
+        gs.changePlayer(jugador_enemic);
+        int enemic_moves = gs.getMoves().size();
+        gs.changePlayer(jugador);
+        if(player_moves + enemic_moves != 0){
+            puntuacio += 100 * (player_moves - enemic_moves) / (player_moves + enemic_moves);
+        }
+        
+        //heuristica de coin party
+        puntuacio += 100 * (gs.getScore(jugador) - gs.getScore(jugador_enemic)) / (gs.getScore(jugador) + gs.getScore(jugador_enemic));
+        
+        return puntuacio;
     }
     //https://play-othello.appspot.com/files/Othello.pdf
     //si el enemigo tiene menos movimientos deberia aumentar la heuristica

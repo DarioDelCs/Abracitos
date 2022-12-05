@@ -8,12 +8,13 @@ import edu.upc.epsevg.prop.othello.Move;
 import edu.upc.epsevg.prop.othello.SearchType;
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author Dario, Xavi
  */
-public class Abracitos implements IPlayer, IAuto {
+public class Abracitos_IDS implements IPlayer, IAuto {
 
     private String name;
     
@@ -21,8 +22,10 @@ public class Abracitos implements IPlayer, IAuto {
     private CellType jugador_enemic = null;
     private boolean timeout = false;
     private int maxima_profunditat;
-    private int profunditat;
+    private int profunditat_IDS;
     private long nodes;
+    
+    private List<Integer> millor_posicio = null;
     
     /*private final int[][] taula_heur = {
         {100, -20, 10, 5, 5, 10, -20, 100},
@@ -45,14 +48,13 @@ public class Abracitos implements IPlayer, IAuto {
         {100, 0, 0, 0, 0, 0, 0, 100}
     };*/
 
-    public Abracitos(int profunditat) {
+    public Abracitos_IDS() {
         this.name = "Abracitos";
-        this.profunditat = profunditat;
     }
 
     @Override
     public void timeout() {
-        System.out.println("TIMEOUT");
+        test("TIMEOUT");
         this.timeout = true;
     }
 
@@ -72,6 +74,7 @@ public class Abracitos implements IPlayer, IAuto {
         this.nodes = 0;
         this.timeout = false;
         this.maxima_profunditat = 0;
+        this.profunditat_IDS = 1;
         
         ArrayList<Point> moves =  s.getMoves();
         if(moves.isEmpty())
@@ -93,33 +96,55 @@ public class Abracitos implements IPlayer, IAuto {
     }
     
     public Move novaTirada(AbracitosGame gs, ArrayList<Point> moves) {
-        int millor_heur = Integer.MIN_VALUE;
-        Move millor_tirada = new Move(moves.get(0), 0L, 0,  SearchType.MINIMAX);
+        millor_posicio = new ArrayList();
+        millor_posicio.add(0);
         
-        for (int i = 0; i < moves.size(); i++) {
-            int alpha = Integer.MIN_VALUE;
+        do{
+            int millor_heur = Integer.MIN_VALUE;
+            int millor_posicio_prof = 0;
             
-            AbracitosGame game_aux = new AbracitosGame(gs);
-            game_aux.movePiece(moves.get(i));
-            
-            if (game_aux.isGameOver()) {
-                if(game_aux.GetWinner() == jugador){
-                    
-                    System.out.println("pos win: " + moves.get(i));
-                    return new Move(moves.get(i), nodes, maxima_profunditat,  SearchType.MINIMAX);
-                }
-                
-            } else {
-                alpha = minimitza(game_aux, profunditat - 1, 1, millor_heur, Integer.MAX_VALUE);
+            for (int i : getMovimientos(moves, profunditat_IDS, true)) {
+                int alpha = Integer.MIN_VALUE;
 
-                if (alpha > millor_heur || millor_tirada == null) {
-                    millor_tirada = new Move(moves.get(i), nodes, maxima_profunditat,  SearchType.MINIMAX);
-                    millor_heur = alpha;
+                AbracitosGame game_aux = new AbracitosGame(gs);
+                game_aux.movePiece(moves.get(i));
+
+                if (game_aux.isGameOver()) {
+                    if(game_aux.GetWinner() == jugador){
+                        test("pos win: " + moves.get(i));
+                        return new Move(moves.get(i), nodes, maxima_profunditat,  SearchType.MINIMAX);
+                    }
+
+                } else {
+                    test("Entrando al primer min");
+                    test("i -> " + i + " mp0 -> " + millor_posicio.get(0));
+                    alpha = minimitza(game_aux, profunditat_IDS - 1, 1, millor_heur, Integer.MAX_VALUE, (i==millor_posicio.get(0)));
+
+                    if (alpha > millor_heur) {
+                        millor_posicio_prof = i;
+                        millor_heur = alpha;
+                    }
                 }
             }
-        }
+            if(!timeout){
+                test("update -> 0 -> " + millor_posicio_prof);
+                millor_posicio.set(0, millor_posicio_prof);
+                //reiniciamos los hijos
+                for (int j = 1; j < millor_posicio.size(); j++) {
+                    millor_posicio.set(j, 0);
+                }
+            }
+            profunditat_IDS++;
+            millor_posicio.add(0);
+        }while(!timeout);
         
-        return millor_tirada;
+        test("------------------------------------------");
+        test("");
+        test("");
+        test("");
+        test("------------------------------------------");
+        
+        return new Move(moves.get(millor_posicio.get(0)), nodes, maxima_profunditat,  SearchType.MINIMAX);
     }
     
     /**
@@ -130,36 +155,68 @@ public class Abracitos implements IPlayer, IAuto {
      * @param beta valor heuristic mes baix trobat fins al moment per fer la poda
      * @return retorna la heuristica mes alta de totes les tirades analitzades
      */
-    public int maximitza (AbracitosGame gs, int profunditat, int max_profunditat, int alpha, int beta){
+    public int maximitza (AbracitosGame gs, int profunditat, int max_profunditat, int alpha, int beta, boolean millor_pares){
         ArrayList<Point> moves =  gs.getMoves();
+        
+        
+        test("Prof+ -> " + profunditat);
+        test("Max   -> " + moves.size());
+        
+        
         if(max_profunditat > maxima_profunditat){
             maxima_profunditat = max_profunditat;
         }
         if (timeout || moves.isEmpty() || profunditat == 0) {
-            return heur(gs);
+            return heur(gs);//if timeout return 0;
         }
         
         int nova_alpha = Integer.MIN_VALUE;
-        for (int i = 0; i < moves.size(); i++) {
+        int vella_alpha = Integer.MIN_VALUE;
+        for (int i : getMovimientos(moves, profunditat, millor_pares)) {
             
             AbracitosGame game_aux = new AbracitosGame(gs);
             game_aux.movePiece(moves.get(i));
             if (game_aux.isGameOver()) {
                 if(game_aux.GetWinner() == jugador){
+                test("a -> ");
+                    millor_posicio.set(profunditat_IDS - profunditat, i);
+                test("update -> " + (profunditat_IDS - profunditat) + " -> " + i);
+        test("List+ -> " + millor_posicio.toString());
                     return Integer.MAX_VALUE;
                 }
                 
             } else {
-                nova_alpha = Math.max(nova_alpha, minimitza(game_aux, profunditat - 1, max_profunditat + 1, alpha, beta));
+                test("to min i -> " + i);
+                nova_alpha = Math.max(nova_alpha, minimitza(game_aux, profunditat - 1, max_profunditat + 1, alpha, beta, (i==millor_posicio.get(profunditat_IDS - profunditat))));
                 alpha = Math.max(nova_alpha, alpha);
                 if (alpha >= beta) {
+                test("b -> ");
+                    millor_posicio.set(profunditat_IDS - profunditat, i);
+                    //reiniciamos los hijos
+                    for (int j = profunditat_IDS - profunditat; j < millor_posicio.size(); j++) {
+                        millor_posicio.set(j, 0);
+                    }
+                test("update -> " + (profunditat_IDS - profunditat) + " -> " + i);
+        test("List+ -> " + millor_posicio.toString());
                     return alpha;
+                }
+                if(vella_alpha != nova_alpha){
+                    vella_alpha = nova_alpha;
+                test("c -> ");
+                    millor_posicio.set(profunditat_IDS - profunditat, i);
+                    //reiniciamos los hijos
+                    for (int j = profunditat_IDS - profunditat; j < millor_posicio.size(); j++) {
+                        millor_posicio.set(j, 0);
+                    }
+                test("update -> " + (profunditat_IDS - profunditat) + " -> " + i);
+        test("List+ -> " + millor_posicio.toString());
                 }
             }
         }
         
         return nova_alpha;
     }
+    
     
     /**
      * Funcion que ens indica l'heuristica mes petita trobada per totes les tirades analitzades.
@@ -169,30 +226,64 @@ public class Abracitos implements IPlayer, IAuto {
      * @param beta valor heuristic mes baix trobat fins al moment per fer la poda
      * @return retorna la heuristica mes baixa de totes les tirades analitzades
      */
-    public int minimitza (AbracitosGame gs, int profunditat, int max_profunditat, int alpha, int beta){
+    public int minimitza (AbracitosGame gs, int profunditat, int max_profunditat, int alpha, int beta, boolean millor_pares){
         ArrayList<Point> moves =  gs.getMoves();
+        
+        
+        test("Prof- -> " + profunditat);
+        test("Min   -> " + moves.size());
+        
+        
         if(max_profunditat > maxima_profunditat){
             maxima_profunditat = max_profunditat;
         }
         if (timeout || moves.isEmpty() || profunditat == 0) {
+            if(moves.isEmpty()){
+                test("empty");
+            }
+            test("end T-> " + (timeout?"SI":"NO") + " ME -> " + (moves.isEmpty()?"SI":"NO") + " PROF -> " + (profunditat == 0?"SI":"NO"));
             return heur(gs);
         }
         
         int nova_beta = Integer.MAX_VALUE;
-        for (int i = 0; i < moves.size(); i++) {
+        int vella_beta = Integer.MAX_VALUE;
+        for (int i : getMovimientos(moves, profunditat, millor_pares)) {
             
             AbracitosGame game_aux = new AbracitosGame(gs);
             game_aux.movePiece(moves.get(i));
             if (game_aux.isGameOver()) {
                 if(game_aux.GetWinner() == jugador_enemic){
+                    millor_posicio.set(profunditat_IDS - profunditat, i);
+                test("update -> " + (profunditat_IDS - profunditat) + " -> " + i);
+        test("List- -> " + millor_posicio.toString());
                     return Integer.MIN_VALUE;
                 }
                 
             } else {
-                nova_beta = Math.min(nova_beta, maximitza(game_aux, profunditat - 1, max_profunditat + 1, alpha, beta));
+                test("to max i -> " + i);
+                nova_beta = Math.min(nova_beta, maximitza(game_aux, profunditat - 1, max_profunditat + 1, alpha, beta, (i==millor_posicio.get(profunditat_IDS - profunditat))));
                 beta = Math.min(nova_beta, beta);
                 if (alpha >= beta) {
+                test("b  ");
+                    millor_posicio.set(profunditat_IDS - profunditat, i);
+                    //reiniciamos los hijos
+                    for (int j = profunditat_IDS - profunditat; j < millor_posicio.size(); j++) {
+                        millor_posicio.set(j, 0);
+                    }
+                test("update -> " + (profunditat_IDS - profunditat) + " -> " + i);
+        test("List- -> " + millor_posicio.toString());
                     return beta;
+                }
+                if(vella_beta != nova_beta){
+                test("c ");
+                    vella_beta = nova_beta;
+                    millor_posicio.set(profunditat_IDS - profunditat, i);
+                    //reiniciamos los hijos
+                    for (int j = profunditat_IDS - profunditat; j < millor_posicio.size(); j++) {
+                        millor_posicio.set(j, 0);
+                    }
+                test("update -> " + (profunditat_IDS - profunditat) + " -> " + i);
+        test("List- -> " + millor_posicio.toString());
                 }
             }
         }
@@ -285,4 +376,41 @@ public class Abracitos implements IPlayer, IAuto {
     }
     //https://play-othello.appspot.com/files/Othello.pdf
     //si el enemigo tiene menos movimientos deberia aumentar la heuristica
+    
+    private int[] getMovimientos(ArrayList<Point> moves, int profunditat, boolean millor_pares){
+        int[] movimientos_disponibles = new int[moves.size()];
+        if(!millor_pares){
+            test("not better father");
+            for (int i = 0; i < moves.size(); i++) {
+                movimientos_disponibles[i] = i;
+            }
+            return movimientos_disponibles;
+        }
+        movimientos_disponibles[0] = millor_posicio.get(profunditat_IDS - profunditat);
+        int j = 0;
+        for (int i = 0; i < moves.size()-1; i++) {
+            if(i==movimientos_disponibles[0]){
+                j++;
+            }
+            movimientos_disponibles[i+1] = j;
+            j++;
+        }
+        
+        test("ProfIDS-> " + profunditat_IDS);
+        test("List -> " + millor_posicio.toString());
+        test("Arr  -> [");
+        for (int i = 0; i < movimientos_disponibles.length; i++) {
+            test(movimientos_disponibles[i] + ", ");
+        }
+        test("]");
+        
+        return movimientos_disponibles;
+    }
+    
+    
+    private void test(String message){
+        if(false){
+            System.out.println(message);
+        }
+    }
 }

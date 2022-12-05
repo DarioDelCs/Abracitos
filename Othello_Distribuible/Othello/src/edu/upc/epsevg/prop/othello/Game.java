@@ -6,6 +6,7 @@ import edu.upc.epsevg.prop.othello.Level;
 import edu.upc.epsevg.prop.othello.IPlayer;
 import edu.upc.epsevg.prop.othello.players.DesdemonaPlayer;
 import edu.upc.epsevg.prop.othello.players.abracitos.Abracitos;
+import edu.upc.epsevg.prop.othello.players.abracitos.Abracitos_IDS;
 
 
 import javax.swing.SwingUtilities;
@@ -15,7 +16,7 @@ import javax.swing.SwingUtilities;
  * @author bernat
  */
 public class Game {
-        /**
+    /**
      * @param args
      */
     public static void main(String[] args) {
@@ -25,7 +26,7 @@ public class Game {
             @Override
             public void run() {
                 
-                IPlayer player1 = new Abracitos(6);
+                IPlayer player1 = new Abracitos_IDS();
                 //IPlayer player1 = new HumanPlayer("Human1");
                 IPlayer player2 = new DesdemonaPlayer(1);//GB
 

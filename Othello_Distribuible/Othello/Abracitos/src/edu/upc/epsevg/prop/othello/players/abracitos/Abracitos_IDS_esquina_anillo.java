@@ -14,7 +14,7 @@ import java.util.List;
  *
  * @author Dario, Xavi
  */
-public class Abracitos_IDS implements IPlayer, IAuto {
+public class Abracitos_IDS_esquina_anillo implements IPlayer, IAuto {
 
     private String name;
     
@@ -48,7 +48,7 @@ public class Abracitos_IDS implements IPlayer, IAuto {
         {100, 0, 0, 0, 0, 0, 0, 100}
     };*/
 
-    public Abracitos_IDS() {
+    public Abracitos_IDS_esquina_anillo() {
         this.name = "Abracitos";
     }
 
@@ -99,6 +99,7 @@ public class Abracitos_IDS implements IPlayer, IAuto {
         millor_posicio = new ArrayList();
         millor_posicio.add(0);
         
+        
         do{
             int millor_heur = Integer.MIN_VALUE;
             int millor_posicio_prof = 0;
@@ -111,13 +112,13 @@ public class Abracitos_IDS implements IPlayer, IAuto {
 
                 if (game_aux.isGameOver()) {
                     if(game_aux.GetWinner() == jugador){
-test("pos win: " + moves.get(i));
+                        test("pos win: " + moves.get(i));
                         return new Move(moves.get(i), nodes, maxima_profunditat,  SearchType.MINIMAX);
                     }
 
                 } else {
-test("Entrando al primer min");
-test("i -> " + i + " mp0 -> " + millor_posicio.get(0));
+                    test("Entrando al primer min");
+                    test("i -> " + i + " mp0 -> " + millor_posicio.get(0));
                     alpha = minimitza(game_aux, profunditat_IDS - 1, 1, millor_heur, Integer.MAX_VALUE, (i==millor_posicio.get(0)));
 
                     if (alpha > millor_heur) {
@@ -127,26 +128,23 @@ test("i -> " + i + " mp0 -> " + millor_posicio.get(0));
                 }
             }
             if(!timeout){
-test("update -> 0 -> " + millor_posicio_prof);
-                if(millor_posicio.get(0) != millor_posicio_prof){
-                    millor_posicio.set(0, millor_posicio_prof);
-                    //reiniciamos los hijos
-                    for (int j = 1; j < millor_posicio.size(); j++) {
-                        millor_posicio.set(j, 0);
-                    }
+                test("update -> 0 -> " + millor_posicio_prof);
+                millor_posicio.set(0, millor_posicio_prof);
+                //reiniciamos los hijos
+                for (int j = 1; j < millor_posicio.size(); j++) {
+                    millor_posicio.set(j, 0);
                 }
             }
             profunditat_IDS++;
             millor_posicio.add(0);
         }while(!timeout);
         
-test("------------------------------------------");
-test("");
-test("");
-test("");
-test("------------------------------------------");
+        test("------------------------------------------");
+        test("");
+        test("");
+        test("");
+        test("------------------------------------------");
         
-        System.out.println("IDS vell -> " + maxima_profunditat);
         return new Move(moves.get(millor_posicio.get(0)), nodes, maxima_profunditat,  SearchType.MINIMAX);
     }
     
@@ -162,8 +160,8 @@ test("------------------------------------------");
         ArrayList<Point> moves =  gs.getMoves();
         
         
-test("Prof+ -> " + profunditat);
-test("Max   -> " + moves.size());
+        test("Prof+ -> " + profunditat);
+        test("Max   -> " + moves.size());
         
         
         if(max_profunditat > maxima_profunditat){
@@ -181,26 +179,23 @@ test("Max   -> " + moves.size());
             game_aux.movePiece(moves.get(i));
             if (game_aux.isGameOver()) {
                 if(game_aux.GetWinner() == jugador){
-test("a -> ");
+                test("a -> ");
                     millor_posicio.set(profunditat_IDS - profunditat, i);
-test("update -> " + (profunditat_IDS - profunditat) + " -> " + i);
-test("List+ -> " + millor_posicio.toString());
+                test("update -> " + (profunditat_IDS - profunditat) + " -> " + i);
+        test("List+ -> " + millor_posicio.toString());
                     return Integer.MAX_VALUE;
                 }
                 
             } else {
-test("to min i -> " + i);
+                test("to min i -> " + i);
                 nova_alpha = Math.max(nova_alpha, minimitza(game_aux, profunditat - 1, max_profunditat + 1, alpha, beta, (i==millor_posicio.get(profunditat_IDS - profunditat))));
                 alpha = Math.max(nova_alpha, alpha);
                 if (alpha >= beta) {
-test("b -> ");
-                    if(millor_posicio.get(profunditat_IDS - profunditat) != i){
-                test("b.1 -> ");
-                        millor_posicio.set(profunditat_IDS - profunditat, i);
-                        //reiniciamos los hijos
-                        for (int j = profunditat_IDS - profunditat; j < millor_posicio.size(); j++) {
-                            millor_posicio.set(j, 0);
-                        }
+                test("b -> ");
+                    millor_posicio.set(profunditat_IDS - profunditat, i);
+                    //reiniciamos los hijos
+                    for (int j = profunditat_IDS - profunditat; j < millor_posicio.size(); j++) {
+                        millor_posicio.set(j, 0);
                     }
                 test("update -> " + (profunditat_IDS - profunditat) + " -> " + i);
         test("List+ -> " + millor_posicio.toString());
@@ -209,12 +204,10 @@ test("b -> ");
                 if(vella_alpha != nova_alpha){
                     vella_alpha = nova_alpha;
                 test("c -> ");
-                    if(millor_posicio.get(profunditat_IDS - profunditat) != i){
-                        millor_posicio.set(profunditat_IDS - profunditat, i);
-                        //reiniciamos los hijos
-                        for (int j = profunditat_IDS - profunditat; j < millor_posicio.size(); j++) {
-                            millor_posicio.set(j, 0);
-                        }
+                    millor_posicio.set(profunditat_IDS - profunditat, i);
+                    //reiniciamos los hijos
+                    for (int j = profunditat_IDS - profunditat; j < millor_posicio.size(); j++) {
+                        millor_posicio.set(j, 0);
                     }
                 test("update -> " + (profunditat_IDS - profunditat) + " -> " + i);
         test("List+ -> " + millor_posicio.toString());
@@ -273,26 +266,22 @@ test("b -> ");
                 beta = Math.min(nova_beta, beta);
                 if (alpha >= beta) {
                 test("b  ");
-                    if(millor_posicio.get(profunditat_IDS - profunditat) != i){
-                        millor_posicio.set(profunditat_IDS - profunditat, i);
-                        //reiniciamos los hijos
-                        for (int j = profunditat_IDS - profunditat; j < millor_posicio.size(); j++) {
-                            millor_posicio.set(j, 0);
-                        }
+                    millor_posicio.set(profunditat_IDS - profunditat, i);
+                    //reiniciamos los hijos
+                    for (int j = profunditat_IDS - profunditat; j < millor_posicio.size(); j++) {
+                        millor_posicio.set(j, 0);
                     }
                 test("update -> " + (profunditat_IDS - profunditat) + " -> " + i);
         test("List- -> " + millor_posicio.toString());
                     return beta;
                 }
                 if(vella_beta != nova_beta){
-                    vella_beta = nova_beta;
                 test("c ");
-                    if(millor_posicio.get(profunditat_IDS - profunditat) != i){
-                        millor_posicio.set(profunditat_IDS - profunditat, i);
-                        //reiniciamos los hijos
-                        for (int j = profunditat_IDS - profunditat; j < millor_posicio.size(); j++) {
-                            millor_posicio.set(j, 0);
-                        }
+                    vella_beta = nova_beta;
+                    millor_posicio.set(profunditat_IDS - profunditat, i);
+                    //reiniciamos los hijos
+                    for (int j = profunditat_IDS - profunditat; j < millor_posicio.size(); j++) {
+                        millor_posicio.set(j, 0);
                     }
                 test("update -> " + (profunditat_IDS - profunditat) + " -> " + i);
         test("List- -> " + millor_posicio.toString());
@@ -356,7 +345,9 @@ test("b -> ");
             taula_heur[6][7] = 4;
             taula_heur[7][6] = 4;
         }
-        
+        int x,y,my_front_tiles = 0, opp_front_tiles = 0;
+        int X1[] = {-1, -1, 0, 1, 1, 1, 0, -1};
+	int Y1[] = {0, 1, 1, 1, 0, -1, -1, -1};
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 if (gs.getPos(i, j) == this.jugador) {
@@ -364,13 +355,32 @@ test("b -> ");
                 } else if (gs.getPos(i, j) == this.jugador_enemic) {
                     puntuacio -= taula_heur[i][j];
                 }
+                
+                if(gs.getPos(i, j) != CellType.EMPTY)   {
+                        for(int k=0; k<8; k++)  {
+                                x = i + X1[k]; y = j + Y1[k];
+                                if(x >= 0 && x < 8 && y >= 0 && y < 8 && gs.getPos(x, y) == CellType.EMPTY) {
+                            if(gs.getPos(i, j) == this.jugador)  my_front_tiles++;
+                            else opp_front_tiles++;
+                            break;
+                        }
+                    }
+                }
             }
         }
+        if(my_front_tiles > opp_front_tiles)
+		puntuacio = -(100 * my_front_tiles)/(my_front_tiles + opp_front_tiles);
+	else if(my_front_tiles < opp_front_tiles)
+		puntuacio = (100 * opp_front_tiles)/(my_front_tiles + opp_front_tiles);
+	//else puntuacio = 0;
         
         //heuristica de corners
         if(player_corners + enemy_corners != 0){
             puntuacio += 100 * (player_corners - enemy_corners) / (player_corners + enemy_corners);
         }
+        
+        //Heuristica propers a corners
+        puntuacio += cerca_corners(gs);
         
         //heuristica mobility
         int player_moves = gs.getMoves().size();
@@ -424,5 +434,45 @@ test("b -> ");
         if(false){
             System.out.println(message);
         }
+    }
+    
+    int cerca_corners(AbracitosGame gs){
+        int puntuacion = 0;
+        
+	int my_tiles = 0,opp_tiles = 0;
+	if(gs.getPos(0, 0) == CellType.EMPTY)   {
+		if(gs.getPos(0, 1) == this.jugador) my_tiles++;
+		else if(gs.getPos(0, 1) == this.jugador_enemic) opp_tiles++;
+		if(gs.getPos(1, 1) == this.jugador) my_tiles++;
+		else if(gs.getPos(1, 1) == this.jugador_enemic) opp_tiles++;
+		if(gs.getPos(1, 0) == this.jugador) my_tiles++;
+		else if(gs.getPos(1, 0) == this.jugador_enemic) opp_tiles++;
+	}
+	if(gs.getPos(0, 7) == CellType.EMPTY)   {
+		if(gs.getPos(0, 6) == this.jugador) my_tiles++;
+		else if(gs.getPos(0, 6) == this.jugador_enemic) opp_tiles++;
+		if(gs.getPos(1, 6) == this.jugador) my_tiles++;
+		else if(gs.getPos(1, 6) == this.jugador_enemic) opp_tiles++;
+		if(gs.getPos(1, 7) == this.jugador) my_tiles++;
+		else if(gs.getPos(1, 7) == this.jugador_enemic) opp_tiles++;
+	}
+	if(gs.getPos(7, 0) == CellType.EMPTY)   {
+		if(gs.getPos(7, 1) == this.jugador) my_tiles++;
+		else if(gs.getPos(7, 1) == this.jugador_enemic) opp_tiles++;
+		if(gs.getPos(6, 1) == this.jugador) my_tiles++;
+		else if(gs.getPos(6, 1) == this.jugador_enemic) opp_tiles++;
+		if(gs.getPos(6, 0) == this.jugador) my_tiles++;
+		else if(gs.getPos(6, 0) == this.jugador_enemic) opp_tiles++;
+	}
+	if(gs.getPos(7, 7) == CellType.EMPTY)   {
+		if(gs.getPos(6, 7) == this.jugador) my_tiles++;
+		else if(gs.getPos(6, 7) == this.jugador_enemic) opp_tiles++;
+		if(gs.getPos(6, 6) == this.jugador) my_tiles++;
+		else if(gs.getPos(6, 6) == this.jugador_enemic) opp_tiles++;
+		if(gs.getPos(7, 6) == this.jugador) my_tiles++;
+		else if(gs.getPos(7, 6) == this.jugador_enemic) opp_tiles++;
+	}
+        puntuacion = -10 * (my_tiles - opp_tiles);
+        return puntuacion;
     }
 }

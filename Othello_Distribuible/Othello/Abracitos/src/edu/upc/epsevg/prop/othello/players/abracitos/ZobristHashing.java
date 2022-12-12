@@ -42,11 +42,27 @@ public class ZobristHashing {
     
     public void actualitza(GameStatus gs, HashInfo hash_info) {
         int index = this.getHash(gs);   // nos faltaria modulo x para que sea el indice, sino esto es incorrecto
-//        HashInfo map_info = this.zobrist.get(index);
+        HashInfo map_info = this.zobrist.get(index);
+        
+        if(map_info.gettColor().toLongArray()[0] == hash_info.gettColor().toLongArray()[0])
+        
+        
+        
+        
+        
+        
+        if(hash_info.gettColor() == gs.getBoard_color() && info.gettOcupat().toLongArray()[0] == gs.getBoard_occupied().toLongArray()[0]){
+            return info.getHeuristica();
+        }
+        
+        if (hash_info == null || hash_info.getProf() < hash_info.getProf()){
+            this.zobrist.put(hash, hash_info);
+        } 
+        
+        
+        
+        
         this.zobrist.put(index, hash_info);
-//        if (map_info == null || map_info.getProf() < hash_info.getProf()){
-//            this.zobrist.put(hash, hash_info);
-//        } 
     }
     
     public HashInfo getInfo(GameStatus gs) {

@@ -13,36 +13,38 @@ import java.util.BitSet;
 public class HashInfo {
     
     private int heuristica;
-    private int millorFill;
-    private int profunditat;
-    private BitSet tColor;
-    private BitSet tOcupat;
-
-    public HashInfo(int heuristica, int millorFill, BitSet tColor, BitSet tOcupat, int profunditat) {
+    private byte millorFill;
+    private byte profunditat;
+    private long tColor;
+    private long tOcupat;
+    
+    public HashInfo(int heuristica, int millorFill, int profunditat, BitSet tColor, BitSet tOcupat) {
         this.heuristica = heuristica;
-        this.millorFill = millorFill;
-        this.tColor = tColor;
-        this.tOcupat = tOcupat;
-        this.profunditat = profunditat;
+        this.millorFill = (byte)millorFill;
+        this.profunditat = (byte)profunditat;
+        this.tColor = tColor.toLongArray()[0];
+        this.tOcupat = tOcupat.toLongArray()[0];
     }
 
     public int getHeuristica() {
         return heuristica;
     }
 
-    public int getMillorFill() {
+    public short getMillorFill() {
         return millorFill;
     }
 
-    public BitSet gettColor() {
+    public short getProfunditat() {
+        return profunditat;
+    }
+
+    public long gettColor() {
         return tColor;
     }
 
-    public BitSet gettOcupat() {
+    public long gettOcupat() {
         return tOcupat;
     }
 
-    public int getProfunditat() {
-        return profunditat;
-    }
+    
 }

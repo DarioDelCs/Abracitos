@@ -15,7 +15,8 @@ import java.util.Random;
  */
 public class ZobristHashing {
 
-    private final HashMap<Integer, HashInfo> zobrist;
+    private final short mida_hash = 997;
+    private final HashInfo[] zobrist;
     private final int[][][] tablero;
     
     private final HashInfo[] vector_auxiliar;
@@ -23,7 +24,7 @@ public class ZobristHashing {
     private final int moviment_jugador1;
     
     public ZobristHashing() {
-        this.zobrist = new HashMap<>();
+        this.zobrist = new HashInfo[mida_hash];
         this.tablero = new int[8][8][3];
         this.vector_auxiliar = new HashInfo[1];
         
@@ -32,51 +33,29 @@ public class ZobristHashing {
         for(int i = 0; i < 8; i++) {
             for(int j = 0; j < 8; j++) {
                 for(int k = 0; k < 3; k++) {
-                    this.tablero[i][j][k] = rand.nextInt();
+                    this.tablero[i][j][k] = Math.abs(rand.nextInt());
                 }
             }
         }
         
-        this.moviment_jugador1 = rand.nextInt();
+        this.moviment_jugador1 = Math.abs(rand.nextInt());
     }
     
     public void actualitza(GameStatus gs, HashInfo hash_info) {
-        int index = this.getHash(gs);   // nos faltaria modulo x para que sea el indice, sino esto es incorrecto
-        HashInfo map_info = this.zobrist.get(index);
+        int index = this.getHash(gs) % mida_hash;
+        HashInfo map_info = this.zobrist[index];
         
-        if(map_info.gettColor().toLongArray()[0] == hash_info.gettColor().toLongArray()[0])
-        
-        
-        
-        
-        
-        
-        if(hash_info.gettColor() == gs.getBoard_color() && info.gettOcupat().toLongArray()[0] == gs.getBoard_occupied().toLongArray()[0]){
-            return info.getHeuristica();
+        if (map_info == null || map_info.getProfunditat() < hash_info.getProfunditat()){
+            this.zobrist[index] = hash_info;
         }
-        
-        if (hash_info == null || hash_info.getProf() < hash_info.getProf()){
-            this.zobrist.put(hash, hash_info);
-        } 
-        
-        
-        
-        
-        this.zobrist.put(index, hash_info);
     }
     
     public HashInfo getInfo(GameStatus gs) {
-        int hash = this.getHash(gs);
-        if (this.zobrist.containsKey(hash)) {
-            HashInfo info = this.zobrist.get(hash);
-//            if (info.profundidad >= profundidad) {
-//                return info;
-//            }
-        }
-        return null;
+        int index = this.getHash(gs) % mida_hash;
+        return this.zobrist[index];
     }
     
-    public int getHash (GameStatus gs) {
+    private int getHash (GameStatus gs) {
         int mida = gs.getSize();
         int hash = 0;
                 

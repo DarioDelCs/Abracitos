@@ -161,12 +161,22 @@ public class Abracitos_IDS_Hash implements IPlayer, IAuto {
         if (timeout || moves.isEmpty() || profunditat == 0) {
             int heur = heur(ag);
             taula_hash.actualitza(ag, new HashInfo(heur, -1, maxima_profunditat - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 0));
-            return heur;//if timeout return 0;
+            return heur;
         }
         
         int nova_alpha = Integer.MIN_VALUE;
         int vella_alpha = Integer.MIN_VALUE;
         int millor_posicio = 0;
+        
+        HashInfo info = taula_hash.getInfo(ag);
+        if(info != null && info.gettColor() == ag.getBoard_color().toLongArray()[0] && info.gettOcupat() == ag.getBoard_occupied().toLongArray()[0] && maxima_profunditat - profunditat > info.getProfunditat()){
+            if (info.getTipusPoda() == 1){
+                alpha = info.getHeuristica();
+            }else if (info.getTipusPoda() == 0){
+                taula_hash.actualitza(ag, new HashInfo(info.getHeuristica(), info.getMillorFill(), maxima_profunditat - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 0));
+                return info.getHeuristica();
+            }
+        }
         
         for (int i : getMovimientos(ag, moves)) {
             
@@ -176,16 +186,11 @@ public class Abracitos_IDS_Hash implements IPlayer, IAuto {
             
             if (game_aux.isGameOver()) {
                 if(game_aux.GetWinner() == jugador){
-//                    taula_hash.actualitza(game_aux, new HashInfo(Integer.MAX_VALUE, i, maxima_profunditat - profunditat, game_aux.getBoard_color(), game_aux.getBoard_occupied()));
+                    taula_hash.actualitza(game_aux, new HashInfo(Integer.MAX_VALUE, i, maxima_profunditat - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 0));
                     return Integer.MAX_VALUE;
                 }
                 
             } else {
-                HashInfo info = taula_hash.getInfo(game_aux);
-                if(info != null && info.gettColor() == game_aux.getBoard_color().toLongArray()[0] && info.gettOcupat() == game_aux.getBoard_occupied().toLongArray()[0]){
-                    alpha = info.getHeuristica();
-                }
-                
                 vella_alpha = nova_alpha;
                 nova_alpha = Math.max(nova_alpha, minimitza(game_aux, profunditat - 1, max_profunditat + 1, alpha, beta));
                 if(vella_alpha != nova_alpha){
@@ -194,14 +199,13 @@ public class Abracitos_IDS_Hash implements IPlayer, IAuto {
                 
                 alpha = Math.max(nova_alpha, alpha);
                 if (alpha >= beta) {
-                    //taula_hash.actualitza(ag, new HashInfo(alpha, -1, maxima_profunditat - profunditat, ag.getBoard_color(), ag.getBoard_occupied()));
+                    taula_hash.actualitza(ag, new HashInfo(alpha, -1, maxima_profunditat - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 1));
                     return alpha;
                 }
             }
         }
         
         taula_hash.actualitza(ag, new HashInfo(alpha, millor_posicio, maxima_profunditat - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 0));
-        
         return nova_alpha;
     }
     
@@ -231,11 +235,13 @@ public class Abracitos_IDS_Hash implements IPlayer, IAuto {
         int millor_tirada = 0;
         
         HashInfo info = taula_hash.getInfo(ag);
-        if(info != null && info.gettColor() == ag.getBoard_color().toLongArray()[0] && info.gettOcupat() == ag.getBoard_occupied().toLongArray()[0] && prof){
-            if (poda es alpha beta o heru)
-            beta = info.getHeuristica();
-        taula_hash.actualitza(ag, new HashInfo(beta, -1, maxima_profunditat - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 0));
-            return en cas de heuristica segueix sino;
+        if(info != null && info.gettColor() == ag.getBoard_color().toLongArray()[0] && info.gettOcupat() == ag.getBoard_occupied().toLongArray()[0] && maxima_profunditat - profunditat > info.getProfunditat()){
+            if (info.getTipusPoda() == 2){
+                beta = info.getHeuristica();
+            }else if (info.getTipusPoda() == 0){
+                taula_hash.actualitza(ag, new HashInfo(info.getHeuristica(), info.getMillorFill(), maxima_profunditat - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 0));
+                return info.getHeuristica();
+            }
         }
         
         for (int i : getMovimientos(ag, moves)) {
@@ -245,7 +251,7 @@ public class Abracitos_IDS_Hash implements IPlayer, IAuto {
             
             if (game_aux.isGameOver()) {
                 if(game_aux.GetWinner() == jugador_enemic){
-        taula_hash.actualitza(ag, new HashInfo(beta, -1, maxima_profunditat - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 0));
+                    taula_hash.actualitza(ag, new HashInfo(Integer.MIN_VALUE, i, maxima_profunditat - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 0));
                     return Integer.MIN_VALUE;
                 }
                 
@@ -258,7 +264,7 @@ public class Abracitos_IDS_Hash implements IPlayer, IAuto {
                 
                 beta = Math.min(nova_beta, beta);
                 if (alpha >= beta) {
-        taula_hash.actualitza(ag, new HashInfo(beta, -1, maxima_profunditat - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 2));
+                    taula_hash.actualitza(ag, new HashInfo(beta, -1, maxima_profunditat - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 2));
                     return beta;
                 }
             }

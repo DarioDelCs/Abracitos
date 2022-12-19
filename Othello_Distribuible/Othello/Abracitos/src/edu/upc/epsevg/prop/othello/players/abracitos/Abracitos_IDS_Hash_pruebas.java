@@ -16,7 +16,7 @@ import java.util.Random;
  *
  * @author Dario, Xavi
  */
-public class Abracitos_IDS_Hash implements IPlayer, IAuto {
+public class Abracitos_IDS_Hash_pruebas implements IPlayer, IAuto {
 
     private String name;
     
@@ -52,7 +52,7 @@ public class Abracitos_IDS_Hash implements IPlayer, IAuto {
         {100, 0, 0, 0, 0, 0, 0, 100}
     };*/
 
-    public Abracitos_IDS_Hash(String name, int dimensio_taula_GB) {
+    public Abracitos_IDS_Hash_pruebas(String name, int dimensio_taula_GB) {
         this.name = name;
         this.dimensio_taula = 40949;
     }
@@ -335,9 +335,9 @@ public class Abracitos_IDS_Hash implements IPlayer, IAuto {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 if (ag.getPos(i, j) == this.jugador) {
-                    puntuacio += 100*taula_heur[i][j];
+                    puntuacio += taula_heur[i][j];
                 } else if (ag.getPos(i, j) == this.jugador_enemic) {
-                    puntuacio -= 100*taula_heur[i][j];
+                    puntuacio -= taula_heur[i][j];
                 }
                 if(ag.getPos(i, j) != CellType.EMPTY)   {
                         for(int k=0; k<8; k++)  {

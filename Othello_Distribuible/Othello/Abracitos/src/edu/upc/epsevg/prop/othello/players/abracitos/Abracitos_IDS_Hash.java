@@ -335,9 +335,9 @@ public class Abracitos_IDS_Hash implements IPlayer, IAuto {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 if (ag.getPos(i, j) == this.jugador) {
-                    puntuacio += 100*taula_heur[i][j];
+                    puntuacio += taula_heur[i][j];
                 } else if (ag.getPos(i, j) == this.jugador_enemic) {
-                    puntuacio -= 100*taula_heur[i][j];
+                    puntuacio -= taula_heur[i][j];
                 }
                 if(ag.getPos(i, j) != CellType.EMPTY)   {
                         for(int k=0; k<8; k++)  {
@@ -353,7 +353,6 @@ public class Abracitos_IDS_Hash implements IPlayer, IAuto {
         }
         
         //Heuristica dels anells
-
         if(my_front_tiles > opp_front_tiles)
 		puntuacio = -(200 * my_front_tiles)/(my_front_tiles + opp_front_tiles);
 	else if(my_front_tiles < opp_front_tiles)

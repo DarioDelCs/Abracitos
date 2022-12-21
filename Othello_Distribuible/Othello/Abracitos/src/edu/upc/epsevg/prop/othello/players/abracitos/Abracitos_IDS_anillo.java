@@ -348,6 +348,7 @@ public class Abracitos_IDS_anillo implements IPlayer, IAuto {
         int x,y,my_front_tiles = 0, opp_front_tiles = 0;
         int X1[] = {-1, -1, 0, 1, 1, 1, 0, -1};
 	int Y1[] = {0, 1, 1, 1, 0, -1, -1, -1};
+        
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 if (gs.getPos(i, j) == this.jugador) {

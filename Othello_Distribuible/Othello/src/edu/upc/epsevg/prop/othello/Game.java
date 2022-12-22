@@ -36,12 +36,12 @@ public class Game {
             @Override
             public void run() {
                 //IPlayer player2 = new Abracitos_IDS_Hash("A_Hash", 1);
-//                IPlayer player1 = new Abracitos_Thread("pruebas", 1);
+                IPlayer player1 = new Abracitos_Thread("pruebas", 2);
 //                  IPlayer player1 = new Abracitos_IDS_anillo();
-                IPlayer player2 = new Abracitos_IDS_Hash_pruebas("winner", 1);
+                IPlayer player2 = new Abracitos_IDS_Hash_pruebas("winner", 2);
 //                IPlayer player1 = new HumanPlayer("Human1");
 //                IPlayer player1 = new Abracitos(10);
-                IPlayer player1 = new DesdemonaPlayer(1);//GB
+//                IPlayer player1 = new DesdemonaPlayer(1);//GB
 
                 //player 1 no_ids vs player 2 ids peta
                                 

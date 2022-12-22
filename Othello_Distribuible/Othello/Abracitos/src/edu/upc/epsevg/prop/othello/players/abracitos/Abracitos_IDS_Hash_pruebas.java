@@ -30,32 +30,10 @@ public class Abracitos_IDS_Hash_pruebas implements IPlayer, IAuto {
     private int dimensio_taula;
     
     private ZobristHashing taula_hash = null;
-    
-    
-    /*private final int[][] taula_heur = {
-        {100, -20, 10, 5, 5, 10, -20, 100},
-        {-20, -50, -2,-2,-2, -2, -50, -20},
-        {10 , -2 , -1,-1,-1, -1, -2 ,  10},
-        {5  , -2 , -1,-1,-1, -1, -2 ,   5},
-        {5  , -2 , -1,-1,-1, -1, -2 ,   5},
-        {10 , -2 , -1,-1,-1, -1, -2 ,  10},
-        {-20, -50, -2,-2,-2, -2, -50, -20},
-        {100, -20, 10, 5, 5, 10, -20, 100}
-    };*/
-    /*private final int[][] taula_heur = {
-        {100, 0, 0, 0, 0, 0, 0, 100},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {100, 0, 0, 0, 0, 0, 0, 100}
-    };*/
 
     public Abracitos_IDS_Hash_pruebas(String name, int dimensio_taula_GB) {
         this.name = name;
-        this.dimensio_taula = 199999;//40949;
+        this.dimensio_taula = 500009;
     }
 
     @Override
@@ -341,9 +319,10 @@ public class Abracitos_IDS_Hash_pruebas implements IPlayer, IAuto {
                     puntuacio -= taula_heur[i][j];
                 }
                 if(ag.getPos(i, j) != CellType.EMPTY)   {
-                        for(int k=0; k<8; k++)  {
-                                x = i + X1[k]; y = j + Y1[k];
-                                if(x >= 0 && x < 8 && y >= 0 && y < 8 && ag.getPos(x, y) == CellType.EMPTY) {
+                    for(int k=0; k<8; k++)  {
+                        x = i + X1[k];
+                        y = j + Y1[k];
+                        if(x >= 0 && x < 8 && y >= 0 && y < 8 && ag.getPos(x, y) == CellType.EMPTY) {
                             if(ag.getPos(i, j) == this.jugador)  my_front_tiles++;
                             else opp_front_tiles++;
                             break;
@@ -356,9 +335,9 @@ public class Abracitos_IDS_Hash_pruebas implements IPlayer, IAuto {
         //Heuristica dels anells
 
         if(my_front_tiles > opp_front_tiles)
-		puntuacio = -(200 * my_front_tiles)/(my_front_tiles + opp_front_tiles);
+		puntuacio -= (200 * my_front_tiles)/(my_front_tiles + opp_front_tiles);
 	else if(my_front_tiles < opp_front_tiles)
-		puntuacio = (200 * opp_front_tiles)/(my_front_tiles + opp_front_tiles);
+		puntuacio += (200 * opp_front_tiles)/(my_front_tiles + opp_front_tiles);
         
         //heuristica de corners
         if(player_corners + enemy_corners != 0){

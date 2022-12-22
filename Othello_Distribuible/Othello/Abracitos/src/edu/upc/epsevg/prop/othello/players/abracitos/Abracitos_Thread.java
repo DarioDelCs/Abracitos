@@ -36,35 +36,13 @@ public class Abracitos_Thread implements IPlayer, IAuto {
     private ZobristHashing taula_hash = null;
     private byte num_threads;
     
-    
-    /*private final int[][] taula_heur = {
-        {100, -20, 10, 5, 5, 10, -20, 100},
-        {-20, -50, -2,-2,-2, -2, -50, -20},
-        {10 , -2 , -1,-1,-1, -1, -2 ,  10},
-        {5  , -2 , -1,-1,-1, -1, -2 ,   5},
-        {5  , -2 , -1,-1,-1, -1, -2 ,   5},
-        {10 , -2 , -1,-1,-1, -1, -2 ,  10},
-        {-20, -50, -2,-2,-2, -2, -50, -20},
-        {100, -20, 10, 5, 5, 10, -20, 100}
-    };*/
-    /*private final int[][] taula_heur = {
-        {100, 0, 0, 0, 0, 0, 0, 100},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {100, 0, 0, 0, 0, 0, 0, 100}
-    };*/
-
     public Abracitos_Thread(String name, int mode) {
         this.name = name;
         if(mode == 1){
-            this.dimensio_taula = 150001;//40949;
+            this.dimensio_taula = 150001;
             this.num_threads = 2;
         }else if(mode == 2){
-            this.dimensio_taula = 199999;
+            this.dimensio_taula = 500009;
             this.num_threads = 4;
         }
     }
@@ -392,9 +370,10 @@ public class Abracitos_Thread implements IPlayer, IAuto {
                     puntuacio -= taula_heur[i][j];
                 }
                 if(ag.getPos(i, j) != CellType.EMPTY)   {
-                        for(int k=0; k<8; k++)  {
-                                x = i + X1[k]; y = j + Y1[k];
-                                if(x >= 0 && x < 8 && y >= 0 && y < 8 && ag.getPos(x, y) == CellType.EMPTY) {
+                    for(int k=0; k<8; k++)  {
+                        x = i + X1[k];
+                        y = j + Y1[k];
+                        if(x >= 0 && x < 8 && y >= 0 && y < 8 && ag.getPos(x, y) == CellType.EMPTY) {
                             if(ag.getPos(i, j) == this.jugador)  my_front_tiles++;
                             else opp_front_tiles++;
                             break;
@@ -406,9 +385,9 @@ public class Abracitos_Thread implements IPlayer, IAuto {
         
         //Heuristica dels anells
         if(my_front_tiles > opp_front_tiles)
-		puntuacio = -(200 * my_front_tiles)/(my_front_tiles + opp_front_tiles);
+		puntuacio -= (200 * my_front_tiles)/(my_front_tiles + opp_front_tiles);
 	else if(my_front_tiles < opp_front_tiles)
-		puntuacio = (200 * opp_front_tiles)/(my_front_tiles + opp_front_tiles);
+		puntuacio += (200 * opp_front_tiles)/(my_front_tiles + opp_front_tiles);
         
         //heuristica de corners
         if(player_corners + enemy_corners != 0){
@@ -440,19 +419,6 @@ public class Abracitos_Thread implements IPlayer, IAuto {
         for (int i = 0; i < moves.size(); i++) {
             movimientos_disponibles[i] = i;
         }
-        
-//        if(a){
-//            System.out.println("----------------");
-//            if(hi != null){
-//                System.out.println(hi.getMillorFill());
-//                System.out.println(hi.gettColor());
-//                System.out.println(ag.getBoard_color().toLongArray()[0]);
-//                System.out.println(hi.gettOcupat());
-//                System.out.println(ag.getBoard_occupied().toLongArray()[0]);
-//            }else{
-//                System.out.println("es null");
-//            }
-//        }
         
         if(hi != null && hi.getMillorFill() > 0 && hi.gettColor() == ag.getBoard_color().toLongArray()[0] && hi.gettOcupat() == ag.getBoard_occupied().toLongArray()[0]){
             movimientos_disponibles[hi.getMillorFill()] = 0;

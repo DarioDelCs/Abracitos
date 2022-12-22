@@ -15,7 +15,7 @@ import java.util.Random;
  */
 public class ZobristHashing {
 
-    private final short mida_hash = 997;
+    private final int mida_hash;
     private final HashInfo[] zobrist;
     private final int[][][] tablero;
     
@@ -23,7 +23,8 @@ public class ZobristHashing {
 
     private final int moviment_jugador1;
     
-    public ZobristHashing() {
+    public ZobristHashing(int mida_hash) {
+        this.mida_hash = mida_hash;
         this.zobrist = new HashInfo[mida_hash];
         this.tablero = new int[8][8][3];
         this.vector_auxiliar = new HashInfo[1];
@@ -45,7 +46,7 @@ public class ZobristHashing {
         int index = this.getHash(gs) % mida_hash;
         HashInfo map_info = this.zobrist[index];
         
-        if (map_info == null || map_info.getProfunditat() < hash_info.getProfunditat()){
+        if (map_info == null || map_info.getProfunditat() <= hash_info.getProfunditat()){
             this.zobrist[index] = hash_info;
         }
     }

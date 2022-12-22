@@ -7,6 +7,7 @@ import edu.upc.epsevg.prop.othello.IPlayer;
 import edu.upc.epsevg.prop.othello.Move;
 import edu.upc.epsevg.prop.othello.SearchType;
 import java.awt.Point;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +27,7 @@ public class Abracitos_IDS_Hash_pruebas implements IPlayer, IAuto {
     private int maxima_profunditat;
     private int profunditat_IDS;
     private long nodes;
-    private long dimensio_taula;
+    private int dimensio_taula;
     
     private ZobristHashing taula_hash = null;
     
@@ -54,7 +55,7 @@ public class Abracitos_IDS_Hash_pruebas implements IPlayer, IAuto {
 
     public Abracitos_IDS_Hash_pruebas(String name, int dimensio_taula_GB) {
         this.name = name;
-        this.dimensio_taula = 40949;
+        this.dimensio_taula = 199999;//40949;
     }
 
     @Override
@@ -101,15 +102,15 @@ public class Abracitos_IDS_Hash_pruebas implements IPlayer, IAuto {
     }
     
     public Move novaTirada(AbracitosGame gs) {
-        taula_hash = new ZobristHashing();
+        taula_hash = new ZobristHashing(dimensio_taula);
         int millor_posicio = 0;
         ArrayList<Point> moves = gs.getMoves();
         
         do{
             int millor_heur = Integer.MIN_VALUE;
             int millor_posicio_prof = 0;
-            
-            for (int i : getMovimientos(gs, moves)) {
+
+            for (int i : getMovimientos(gs, moves, true)) {
                 int alpha = Integer.MIN_VALUE;
                 
                 AbracitosGame game_aux = new AbracitosGame(gs);
@@ -131,7 +132,7 @@ public class Abracitos_IDS_Hash_pruebas implements IPlayer, IAuto {
             }
             
             if(!timeout){
-                taula_hash.actualitza(gs, new HashInfo(millor_heur, millor_posicio_prof, 1, gs.getBoard_color(), gs.getBoard_occupied(), 0));
+                taula_hash.actualitza(gs, new HashInfo(millor_heur, millor_posicio_prof, profunditat_IDS, gs.getBoard_color(), gs.getBoard_occupied(), 0));
                 millor_posicio = millor_posicio_prof;
             }
             if(gs.getEmptyCellsCount() < 20){
@@ -160,7 +161,7 @@ public class Abracitos_IDS_Hash_pruebas implements IPlayer, IAuto {
         }
         if (timeout || moves.isEmpty() || profunditat == 0) {
             int heur = heur(ag);
-            taula_hash.actualitza(ag, new HashInfo(heur, -1, maxima_profunditat - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 0));
+            taula_hash.actualitza(ag, new HashInfo(heur, -1, profunditat_IDS - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 0));
             return heur;
         }
         
@@ -169,16 +170,16 @@ public class Abracitos_IDS_Hash_pruebas implements IPlayer, IAuto {
         int millor_posicio = 0;
         
         HashInfo info = taula_hash.getInfo(ag);
-        if(info != null && info.gettColor() == ag.getBoard_color().toLongArray()[0] && info.gettOcupat() == ag.getBoard_occupied().toLongArray()[0] && maxima_profunditat - profunditat > info.getProfunditat()){
+        if(info != null && info.gettColor() == ag.getBoard_color().toLongArray()[0] && info.gettOcupat() == ag.getBoard_occupied().toLongArray()[0] && profunditat_IDS - profunditat > info.getProfunditat()){
             if (info.getTipusPoda() == 1){
                 alpha = info.getHeuristica();
             }else if (info.getTipusPoda() == 0){
-                taula_hash.actualitza(ag, new HashInfo(info.getHeuristica(), info.getMillorFill(), maxima_profunditat - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 0));
+                taula_hash.actualitza(ag, new HashInfo(info.getHeuristica(), info.getMillorFill(), profunditat_IDS - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 0));
                 return info.getHeuristica();
             }
         }
         
-        for (int i : getMovimientos(ag, moves)) {
+        for (int i : getMovimientos(ag, moves, false)) {
             
             AbracitosGame game_aux = new AbracitosGame(ag);
             game_aux.movePiece(moves.get(i));
@@ -186,7 +187,7 @@ public class Abracitos_IDS_Hash_pruebas implements IPlayer, IAuto {
             
             if (game_aux.isGameOver()) {
                 if(game_aux.GetWinner() == jugador){
-                    taula_hash.actualitza(game_aux, new HashInfo(Integer.MAX_VALUE, i, maxima_profunditat - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 0));
+                    taula_hash.actualitza(game_aux, new HashInfo(Integer.MAX_VALUE, i, profunditat_IDS - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 0));
                     return Integer.MAX_VALUE;
                 }
                 
@@ -199,13 +200,13 @@ public class Abracitos_IDS_Hash_pruebas implements IPlayer, IAuto {
                 
                 alpha = Math.max(nova_alpha, alpha);
                 if (alpha >= beta) {
-                    taula_hash.actualitza(ag, new HashInfo(alpha, -1, maxima_profunditat - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 1));
+                    taula_hash.actualitza(ag, new HashInfo(alpha, -1, profunditat_IDS - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 1));
                     return alpha;
                 }
             }
         }
         
-        taula_hash.actualitza(ag, new HashInfo(alpha, millor_posicio, maxima_profunditat - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 0));
+        taula_hash.actualitza(ag, new HashInfo(alpha, millor_posicio, profunditat_IDS - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 0));
         return nova_alpha;
     }
     
@@ -226,7 +227,7 @@ public class Abracitos_IDS_Hash_pruebas implements IPlayer, IAuto {
         }
         if (timeout || moves.isEmpty() || profunditat == 0) {
             int heur = heur(ag);
-            taula_hash.actualitza(ag, new HashInfo(heur, -1, maxima_profunditat - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 0));
+            taula_hash.actualitza(ag, new HashInfo(heur, -1, profunditat_IDS - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 0));
             return heur;
         }
         
@@ -235,23 +236,23 @@ public class Abracitos_IDS_Hash_pruebas implements IPlayer, IAuto {
         int millor_tirada = 0;
         
         HashInfo info = taula_hash.getInfo(ag);
-        if(info != null && info.gettColor() == ag.getBoard_color().toLongArray()[0] && info.gettOcupat() == ag.getBoard_occupied().toLongArray()[0] && maxima_profunditat - profunditat > info.getProfunditat()){
+        if(info != null && info.gettColor() == ag.getBoard_color().toLongArray()[0] && info.gettOcupat() == ag.getBoard_occupied().toLongArray()[0] && profunditat_IDS - profunditat > info.getProfunditat()){
             if (info.getTipusPoda() == 2){
                 beta = info.getHeuristica();
             }else if (info.getTipusPoda() == 0){
-                taula_hash.actualitza(ag, new HashInfo(info.getHeuristica(), info.getMillorFill(), maxima_profunditat - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 0));
+                taula_hash.actualitza(ag, new HashInfo(info.getHeuristica(), info.getMillorFill(), profunditat_IDS - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 0));
                 return info.getHeuristica();
             }
         }
         
-        for (int i : getMovimientos(ag, moves)) {
+        for (int i : getMovimientos(ag, moves, false)) {
             
             AbracitosGame game_aux = new AbracitosGame(ag);
             game_aux.movePiece(moves.get(i));
             
             if (game_aux.isGameOver()) {
                 if(game_aux.GetWinner() == jugador_enemic){
-                    taula_hash.actualitza(ag, new HashInfo(Integer.MIN_VALUE, i, maxima_profunditat - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 0));
+                    taula_hash.actualitza(ag, new HashInfo(Integer.MIN_VALUE, i, profunditat_IDS - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 0));
                     return Integer.MIN_VALUE;
                 }
                 
@@ -264,13 +265,13 @@ public class Abracitos_IDS_Hash_pruebas implements IPlayer, IAuto {
                 
                 beta = Math.min(nova_beta, beta);
                 if (alpha >= beta) {
-                    taula_hash.actualitza(ag, new HashInfo(beta, -1, maxima_profunditat - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 2));
+                    taula_hash.actualitza(ag, new HashInfo(beta, -1, profunditat_IDS - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 2));
                     return beta;
                 }
             }
         }
         
-        taula_hash.actualitza(ag, new HashInfo(beta, millor_tirada, maxima_profunditat - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 0));
+        taula_hash.actualitza(ag, new HashInfo(beta, millor_tirada, profunditat_IDS - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 0));
         return nova_beta;
     }
     
@@ -381,7 +382,7 @@ public class Abracitos_IDS_Hash_pruebas implements IPlayer, IAuto {
     //https://play-othello.appspot.com/files/Othello.pdf
     //si el enemigo tiene menos movimientos deberia aumentar la heuristica
     
-    private int[] getMovimientos(AbracitosGame ag, ArrayList<Point> moves){
+    private int[] getMovimientos(AbracitosGame ag, ArrayList<Point> moves, boolean a){
         
         int[] movimientos_disponibles = new int[moves.size()];
         HashInfo hi = this.taula_hash.getInfo(ag);

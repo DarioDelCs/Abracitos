@@ -26,7 +26,7 @@ public class Abracitos_IDS_Hash implements IPlayer, IAuto {
     private int maxima_profunditat;
     private int profunditat_IDS;
     private long nodes;
-    private long dimensio_taula;
+    private int dimensio_taula;
     
     private ZobristHashing taula_hash = null;
     
@@ -101,7 +101,7 @@ public class Abracitos_IDS_Hash implements IPlayer, IAuto {
     }
     
     public Move novaTirada(AbracitosGame gs) {
-        taula_hash = new ZobristHashing();
+        taula_hash = new ZobristHashing(this.dimensio_taula);
         int millor_posicio = 0;
         ArrayList<Point> moves = gs.getMoves();
         

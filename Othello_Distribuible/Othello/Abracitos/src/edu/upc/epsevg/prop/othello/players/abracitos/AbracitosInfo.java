@@ -10,19 +10,23 @@ package edu.upc.epsevg.prop.othello.players.abracitos;
  */
 public class AbracitosInfo {
         private int millor_heur;
-        private int millor_posicio_prof;
+        private int posicio;
 
-    public AbracitosInfo(int millor_heur, int millor_posicio_prof) {
+    public AbracitosInfo(int millor_heur, int posicio) {
         this.millor_heur = millor_heur;
-        this.millor_posicio_prof = millor_posicio_prof;
+        this.posicio = posicio;
     }
 
     public int getMillor_heur() {
         return millor_heur;
     }
 
-    public int getMillor_posicio_prof() {
-        return millor_posicio_prof;
+    public int getPosicio() {
+        return posicio;
     }
-    
+
+    @Override
+    public String toString() {
+        return "AbracitosInfo{" + "millor_heur=" + millor_heur + ", posicio=" + posicio + '}';
+    }
 }

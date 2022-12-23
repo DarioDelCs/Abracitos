@@ -26,6 +26,7 @@ public class Abracitos_Thread implements IPlayer, IAuto {
     private CellType jugador_enemic = null;
     private boolean timeout = false;
     private int maxima_profunditat;
+    private int profunditat_anterior;
     private int profunditat_IDS;
     private long nodes;
     private int dimensio_taula;
@@ -74,6 +75,7 @@ public class Abracitos_Thread implements IPlayer, IAuto {
         this.nodes = 0;
         this.timeout = false;
         this.maxima_profunditat = 0;
+        this.profunditat_anterior = 0;
         this.profunditat_IDS = 2;
         this.taula_hash = new ZobristHashing(dimensio_taula);
         
@@ -164,10 +166,11 @@ public class Abracitos_Thread implements IPlayer, IAuto {
                 return new Move(null, 0L, 0,  SearchType.MINIMAX);
             }
             
-            //en cas de que hagui explorat tota la profunditat, actualitzarem les dades de la taula i asignarem la nova posicio de la millor tirada
+            //en cas de que hagui explorat tota la profunditat, actualitzarem les dades de la taula, asignarem la nova posicio de la millor tirada i actualitzem la profunditat maxima
             if(!timeout){
                 taula_hash.actualitza(gs, new HashInfo(millor_heur, millor_posicio_prof, profunditat_IDS, gs.getBoard_color(), gs.getBoard_occupied(), 0));
                 millor_posicio = millor_posicio_prof;
+                maxima_profunditat = profunditat_anterior;
             }
             //al principi de la partida jugarem de forma mes defensiva acabant sempre en la fase de minim
             //en cas de que quedin 20 tirades en el joc, observarem totes les profunditats posibles i no donarem preferencia a si hem arribat a un max o a un min
@@ -193,9 +196,9 @@ public class Abracitos_Thread implements IPlayer, IAuto {
     public int maximitza (AbracitosGame ag, int profunditat, int max_profunditat, int alpha, int beta){
         ArrayList<Point> moves =  ag.getMoves();
         
-        //si aquest node esta mes profund que un anterior analitzat actualitzarem la profunditat maxima
-        if(max_profunditat > maxima_profunditat){
-            maxima_profunditat = max_profunditat;
+        //si aquest node esta mes profund que un anterior analitzat actualitzarem la profunditat asolida en aquesta profunditat ids
+        if(max_profunditat > profunditat_anterior){
+            profunditat_anterior = max_profunditat;
         }
         //si s'ha acabat el temps, no hi ha mes moviments, o hem arribat al final del arbre, actualitzarem la taula hash i retornarem la heuristica de la fulla
         if (timeout){
@@ -273,9 +276,9 @@ public class Abracitos_Thread implements IPlayer, IAuto {
     public int minimitza (AbracitosGame ag, int profunditat, int max_profunditat, int alpha, int beta){
         ArrayList<Point> moves =  ag.getMoves();
         
-        //si aquest node esta mes profund que un anterior analitzat actualitzarem la profunditat maxima
-        if(max_profunditat > maxima_profunditat){
-            maxima_profunditat = max_profunditat;
+        //si aquest node esta mes profund que un anterior analitzat actualitzarem la profunditat asolida en aquesta profunditat ids
+        if(max_profunditat > profunditat_anterior){
+            profunditat_anterior = max_profunditat;
         }
         //si s'ha acabat el temps, no hi ha mes moviments, o hem arribat al final del arbre, actualitzarem la taula hash i retornarem la heuristica de la fulla
         if (timeout){

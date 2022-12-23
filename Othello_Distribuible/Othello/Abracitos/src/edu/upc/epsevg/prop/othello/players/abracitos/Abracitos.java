@@ -19,7 +19,6 @@ public class Abracitos implements IPlayer, IAuto {
     
     private CellType jugador = null;
     private CellType jugador_enemic = null;
-    private boolean timeout = false;
     private int maxima_profunditat;
     private int profunditat;
     private long nodes;
@@ -31,8 +30,6 @@ public class Abracitos implements IPlayer, IAuto {
 
     @Override
     public void timeout() {
-        System.out.println("TIMEOUT");
-        this.timeout = true;
     }
 
     /**
@@ -49,7 +46,6 @@ public class Abracitos implements IPlayer, IAuto {
             jugador_enemic = (jugador == CellType.PLAYER1 ? CellType.PLAYER2 : CellType.PLAYER1);
         }
         this.nodes = 0;
-        this.timeout = false;
         this.maxima_profunditat = 0;
         
         ArrayList<Point> moves =  s.getMoves();
@@ -114,7 +110,7 @@ public class Abracitos implements IPlayer, IAuto {
         if(max_profunditat > maxima_profunditat){
             maxima_profunditat = max_profunditat;
         }
-        if (timeout || moves.isEmpty() || profunditat == 0) {
+        if (moves.isEmpty() || profunditat == 0) {
             return heur(gs);
         }
         
@@ -153,7 +149,7 @@ public class Abracitos implements IPlayer, IAuto {
         if(max_profunditat > maxima_profunditat){
             maxima_profunditat = max_profunditat;
         }
-        if (timeout || moves.isEmpty() || profunditat == 0) {
+        if (moves.isEmpty() || profunditat == 0) {
             return heur(gs);
         }
         

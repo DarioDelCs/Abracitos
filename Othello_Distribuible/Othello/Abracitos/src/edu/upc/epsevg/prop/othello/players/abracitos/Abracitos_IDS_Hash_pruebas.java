@@ -114,7 +114,7 @@ public class Abracitos_IDS_Hash_pruebas implements IPlayer, IAuto {
                 millor_posicio = millor_posicio_prof;
             }
             if(gs.getEmptyCellsCount() < 20){
-                profunditat_IDS ++;
+                profunditat_IDS++;
             }else{
                 profunditat_IDS += 2;
             }
@@ -176,11 +176,11 @@ public class Abracitos_IDS_Hash_pruebas implements IPlayer, IAuto {
                     millor_posicio = i;
                 }
                 
-                alpha = Math.max(nova_alpha, alpha);
-                if (alpha >= beta) {
-                    taula_hash.actualitza(ag, new HashInfo(alpha, -1, profunditat_IDS - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 1));
-                    return alpha;
+                if (nova_alpha >= beta) { // alpha
+                    taula_hash.actualitza(ag, new HashInfo(nova_alpha, -1, profunditat_IDS - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 1));//alpha;
+                    return nova_alpha; //alpha;
                 }
+                alpha = Math.max(nova_alpha, alpha);
             }
         }
         
@@ -241,11 +241,11 @@ public class Abracitos_IDS_Hash_pruebas implements IPlayer, IAuto {
                     millor_tirada = i;
                 }
                 
-                beta = Math.min(nova_beta, beta);
-                if (alpha >= beta) {
-                    taula_hash.actualitza(ag, new HashInfo(beta, -1, profunditat_IDS - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 2));
-                    return beta;
+                if (alpha >= nova_beta) {//beta
+                    taula_hash.actualitza(ag, new HashInfo(nova_beta, -1, profunditat_IDS - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 2));//beta
+                    return nova_beta; //beta
                 }
+                beta = Math.min(nova_beta, beta);
             }
         }
         

@@ -52,6 +52,7 @@ public class ZobristHashing {
         HashInfo map_info = this.zobrist[index];
         
         //actualitzarem sempre que en aquella posicio de la taula no hi hagui res o el node que hi havia tingues menys fills que l'actual
+//        if(numero total fiches > que la que hi ha guardada actualitza)
         if (map_info == null || map_info.getProfunditat() <= hash_info.getProfunditat()){
             this.zobrist[index] = hash_info;
         }

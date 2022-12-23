@@ -148,7 +148,6 @@ public class Abracitos_Thread implements IPlayer, IAuto {
             try {
                 //fem que els threads executin les tasques (les obtenen como una cua)
                 resultats = executor.invokeAll(tasques);
-                while(executor.getCompletedTaskCount() != executor.getTaskCount()){}//esperem a que totes les tasques acabin
                 
                 //un cop haguin acabat les tasques tindrem els resultats actualizats, veurem quin te millor heuristica i agafarem aquesta tirada
                 for (Future<AbracitosInfo> resultat : resultats) {
@@ -199,18 +198,21 @@ public class Abracitos_Thread implements IPlayer, IAuto {
             maxima_profunditat = max_profunditat;
         }
         //si s'ha acabat el temps, no hi ha mes moviments, o hem arribat al final del arbre, actualitzarem la taula hash i retornarem la heuristica de la fulla
-        if (timeout || moves.isEmpty() || profunditat == 0) {
+        if (timeout){
+            return 0;
+        }else if(moves.isEmpty() || profunditat == 0){
             int heur = heur(ag);
-            taula_hash.actualitza(ag, new HashInfo(heur, -1, profunditat_IDS - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 0));
+            taula_hash.actualitza(ag, new HashInfo(heur, -1, profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 0));
             return heur;
         }
         
         int nova_alpha = Integer.MIN_VALUE;
-        int vella_alpha = Integer.MIN_VALUE;
+        int vella_alpha;
         int millor_posicio = 0;
         
         HashInfo info = taula_hash.getInfo(ag);
-        if(info != null && info.gettColor() == ag.getBoard_color().toLongArray()[0] && info.gettOcupat() == ag.getBoard_occupied().toLongArray()[0]){// && profunditat_IDS - profunditat > info.getProfunditat()){
+        if(info != null && info.gettColor() == ag.getBoard_color().toLongArray()[0] && info.gettOcupat() == ag.getBoard_occupied().toLongArray()[0] && profunditat < info.getProfunditat()){
+            System.out.println("a");
             //en cas de que aquest node ja l'haguem calculat en una profunditat anteior
             if (info.getTipusPoda() == 1){
                 //si el calcul hauristic hagues sigut de tipus poda alpha, actualitzem el valor de alpha
@@ -219,7 +221,6 @@ public class Abracitos_Thread implements IPlayer, IAuto {
                 
                 // ??????
                 
-                taula_hash.actualitza(ag, new HashInfo(info.getHeuristica(), info.getMillorFill(), profunditat_IDS - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 0));
                 return info.getHeuristica();
             }
         }
@@ -233,7 +234,7 @@ public class Abracitos_Thread implements IPlayer, IAuto {
             if (game_aux.isGameOver()) {
                 if(game_aux.GetWinner() == jugador){
                     //si el joc sacaba i hem guanyat no fa falta calcular mes moviments
-                    taula_hash.actualitza(game_aux, new HashInfo(Integer.MAX_VALUE, i, profunditat_IDS - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 0));
+                    taula_hash.actualitza(game_aux, new HashInfo(Integer.MAX_VALUE, i, profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 0));
                     return Integer.MAX_VALUE;
                 }
                 
@@ -249,14 +250,14 @@ public class Abracitos_Thread implements IPlayer, IAuto {
                 
                 alpha = Math.max(nova_alpha, alpha);
                 if (alpha >= beta) {
-                    taula_hash.actualitza(ag, new HashInfo(alpha, -1, profunditat_IDS - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 1));
+                    taula_hash.actualitza(ag, new HashInfo(alpha, -1, profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 1));
                     return alpha;
                 }
             }
         }
         
         //actualitzem la taula de hash i retornem l'alpha
-        taula_hash.actualitza(ag, new HashInfo(alpha, millor_posicio, profunditat_IDS - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 0));
+        taula_hash.actualitza(ag, new HashInfo(alpha, millor_posicio, profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 0));
         return nova_alpha;
     }
     
@@ -277,18 +278,21 @@ public class Abracitos_Thread implements IPlayer, IAuto {
             maxima_profunditat = max_profunditat;
         }
         //si s'ha acabat el temps, no hi ha mes moviments, o hem arribat al final del arbre, actualitzarem la taula hash i retornarem la heuristica de la fulla
-        if (timeout || moves.isEmpty() || profunditat == 0) {
+        if (timeout){
+            return 0;
+        }else if (moves.isEmpty() || profunditat == 0) {
             int heur = heur(ag);
-            taula_hash.actualitza(ag, new HashInfo(heur, -1, profunditat_IDS - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 0));
+            taula_hash.actualitza(ag, new HashInfo(heur, -1, profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 0));
             return heur;
         }
         
         int nova_beta = Integer.MAX_VALUE;
-        int vella_beta = Integer.MAX_VALUE;
+        int vella_beta;
         int millor_tirada = 0;
         
         HashInfo info = taula_hash.getInfo(ag);
-        if(info != null && info.gettColor() == ag.getBoard_color().toLongArray()[0] && info.gettOcupat() == ag.getBoard_occupied().toLongArray()[0]){// && profunditat_IDS - profunditat > info.getProfunditat()){
+        if(info != null && info.gettColor() == ag.getBoard_color().toLongArray()[0] && info.gettOcupat() == ag.getBoard_occupied().toLongArray()[0] && profunditat < info.getProfunditat()){
+            System.out.println("b");
             //en cas de que aquest node ja l'haguem calculat en una profunditat anteior
             if (info.getTipusPoda() == 2){
                 //si el calcul hauristic hagues sigut de tipus poda beta, actualitzem el valor de beta
@@ -297,7 +301,7 @@ public class Abracitos_Thread implements IPlayer, IAuto {
                 
                 // ??????
                 
-                taula_hash.actualitza(ag, new HashInfo(info.getHeuristica(), info.getMillorFill(), profunditat_IDS - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 0));
+                taula_hash.actualitza(ag, new HashInfo(info.getHeuristica(), info.getMillorFill(), profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 0));
                 return info.getHeuristica();
             }
         }
@@ -311,7 +315,7 @@ public class Abracitos_Thread implements IPlayer, IAuto {
             if (game_aux.isGameOver()) {
                 if(game_aux.GetWinner() == jugador_enemic){
                     //si el joc sacaba i ha guanyat el contrincant no fa falta calcular mes moviments
-                    taula_hash.actualitza(ag, new HashInfo(Integer.MIN_VALUE, i, profunditat_IDS - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 0));
+                    taula_hash.actualitza(ag, new HashInfo(Integer.MIN_VALUE, i, profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 0));
                     return Integer.MIN_VALUE;
                 }
                 
@@ -327,14 +331,14 @@ public class Abracitos_Thread implements IPlayer, IAuto {
                 
                 beta = Math.min(nova_beta, beta);
                 if (alpha >= beta) {
-                    taula_hash.actualitza(ag, new HashInfo(beta, -1, profunditat_IDS - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 2));
+                    taula_hash.actualitza(ag, new HashInfo(beta, -1, profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 2));
                     return beta;
                 }
             }
         }
         
         //actualitzem la taula de hash i retornem la beta
-        taula_hash.actualitza(ag, new HashInfo(beta, millor_tirada, profunditat_IDS - profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 0));
+        taula_hash.actualitza(ag, new HashInfo(beta, millor_tirada, profunditat, ag.getBoard_color(), ag.getBoard_occupied(), 0));
         return nova_beta;
     }
     

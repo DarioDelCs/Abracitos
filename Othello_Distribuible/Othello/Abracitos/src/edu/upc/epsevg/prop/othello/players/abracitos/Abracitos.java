@@ -23,27 +23,6 @@ public class Abracitos implements IPlayer, IAuto {
     private int maxima_profunditat;
     private int profunditat;
     private long nodes;
-    
-    /*private final int[][] taula_heur = {
-        {100, -20, 10, 5, 5, 10, -20, 100},
-        {-20, -50, -2,-2,-2, -2, -50, -20},
-        {10 , -2 , -1,-1,-1, -1, -2 ,  10},
-        {5  , -2 , -1,-1,-1, -1, -2 ,   5},
-        {5  , -2 , -1,-1,-1, -1, -2 ,   5},
-        {10 , -2 , -1,-1,-1, -1, -2 ,  10},
-        {-20, -50, -2,-2,-2, -2, -50, -20},
-        {100, -20, 10, 5, 5, 10, -20, 100}
-    };*/
-    /*private final int[][] taula_heur = {
-        {100, 0, 0, 0, 0, 0, 0, 100},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0, 0},
-        {100, 0, 0, 0, 0, 0, 0, 100}
-    };*/
 
     public Abracitos(int profunditat) {
         this.name = "Abracitos";

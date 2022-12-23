@@ -118,6 +118,9 @@ public class Abracitos_IDS_Hash_pruebas implements IPlayer, IAuto {
             }else{
                 profunditat_IDS += 2;
             }
+            /**
+             * @TODO  tenir variable de profunditat anterior, si no hi ha timeout la vella = actual ,sino no
+             */
         }while(!timeout);
         
         return new Move(moves.get(millor_posicio), nodes, maxima_profunditat,  SearchType.MINIMAX);

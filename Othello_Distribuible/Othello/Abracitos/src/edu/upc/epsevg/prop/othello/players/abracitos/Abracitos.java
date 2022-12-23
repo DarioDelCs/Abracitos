@@ -254,6 +254,10 @@ public class Abracitos implements IPlayer, IAuto {
             taula_heur[7][6] = 4;
         }
         
+        int x,y,my_front_tiles = 0, opp_front_tiles = 0;
+        int X1[] = {-1, -1, 0, 1, 1, 1, 0, -1};
+	int Y1[] = {0, 1, 1, 1, 0, -1, -1, -1};
+        
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 if (gs.getPos(i, j) == this.jugador) {
@@ -261,12 +265,31 @@ public class Abracitos implements IPlayer, IAuto {
                 } else if (gs.getPos(i, j) == this.jugador_enemic) {
                     puntuacio -= taula_heur[i][j];
                 }
+                if(gs.getPos(i, j) != CellType.EMPTY)   {
+                    for(int k=0; k<8; k++)  {
+                        x = i + X1[k];
+                        y = j + Y1[k];
+                        if(x >= 0 && x < 8 && y >= 0 && y < 8 && gs.getPos(x, y) == CellType.EMPTY) {
+                            if(gs.getPos(i, j) == this.jugador)  my_front_tiles++;
+                            else opp_front_tiles++;
+                            break;
+                        }
+                    }
+                }
             }
         }
         
+        //Heuristica dels anells
+
+        if(my_front_tiles > opp_front_tiles)
+		puntuacio -= (200 * my_front_tiles)/(my_front_tiles + opp_front_tiles);
+	else if(my_front_tiles < opp_front_tiles)
+		puntuacio += (200 * opp_front_tiles)/(my_front_tiles + opp_front_tiles);
+        
+        
         //heuristica de corners
         if(player_corners + enemy_corners != 0){
-            puntuacio += 100 * (player_corners - enemy_corners) / (player_corners + enemy_corners);
+            puntuacio += 500 * (player_corners - enemy_corners) / (player_corners + enemy_corners);
         }
         
         //heuristica mobility
@@ -279,7 +302,7 @@ public class Abracitos implements IPlayer, IAuto {
         }
         
         //heuristica de coin party
-        puntuacio += 100 * (gs.getScore(jugador) - gs.getScore(jugador_enemic)) / (gs.getScore(jugador) + gs.getScore(jugador_enemic));
+        puntuacio += 50 * (gs.getScore(jugador) - gs.getScore(jugador_enemic)) / (gs.getScore(jugador) + gs.getScore(jugador_enemic));
         
         return puntuacio;
     }

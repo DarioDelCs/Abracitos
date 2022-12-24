@@ -13,7 +13,7 @@ import java.util.ArrayList;
  * Clase amb profunditat maxima on s'implamenta el robot per guanyar al othello
  * @author Dario, Xavi
  */
-public class PlayerMinima implements IPlayer, IAuto {
+public class PlayerMiniMax implements IPlayer, IAuto {
 
     private String name;
     
@@ -27,17 +27,17 @@ public class PlayerMinima implements IPlayer, IAuto {
      * Constructor de la clase
      * @param profunditat profunditat a la que arribara el minimax
      */
-    public PlayerMinima(int profunditat) {
+    public PlayerMiniMax(int profunditat) {
         this.name = "Abracitos";
         this.profunditat = profunditat;
     }
 
     /**
      * Ens avisa que hem de parar la cerca en curs perquè s'ha exhaurit el temps de joc.
+     * En el minimax sense IDS no fem res amb aquest metode
      */
     @Override
-    public void timeout() {
-    }
+    public void timeout() {}
 
     /**
      * Decideix el moviment del jugador donat un tauler i un color de peça que ha de posar.

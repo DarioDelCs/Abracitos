@@ -1,14 +1,10 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package edu.upc.epsevg.prop.othello.players.abracitos;
 
 import java.util.BitSet;
 
 /**
- *
- * @author Dario
+ * Clase on guardem la informacio de la taula hash
+ * @author Dario, Xavi
  */
 public class HashInfo {
     
@@ -18,6 +14,7 @@ public class HashInfo {
     private long tColor;
     private long tOcupat;
     private byte tipus_poda;
+    private byte fitxes_totals;
     
     /**
      * Constructor de la clase
@@ -30,14 +27,16 @@ public class HashInfo {
      * 0 -> sense poda, la heuristica = la heuristica
      * 1 -> poda alpha, la heuristica = alpha
      * 2 -> poda beta,  la heuristica = beta 
+     * @param fitxes_totals numero de fitxes totals que te el tauler del joc
      */
-    public HashInfo(int heuristica, int millorFill, int profunditat, BitSet tColor, BitSet tOcupat, int tipus_poda) {
+    public HashInfo(int heuristica, int millorFill, int profunditat, BitSet tColor, BitSet tOcupat, int tipus_poda, int fitxes_totals) {
         this.heuristica = heuristica;
         this.millorFill = (byte)millorFill;
         this.profunditat = (byte)profunditat;
         this.tColor = tColor.toLongArray()[0];
         this.tOcupat = tOcupat.toLongArray()[0];
         this.tipus_poda = (byte)tipus_poda;
+        this.fitxes_totals = (byte)fitxes_totals;
     }
 
     /**
@@ -87,5 +86,12 @@ public class HashInfo {
     public byte getTipusPoda(){
         return tipus_poda;
     }
-    
+
+    /**
+     * Funcio per retornar el numero de fitxes totals del tauler
+     * @return el numero de fitxes totals del tauler
+     */
+    public byte getFitxesTotals() {
+        return fitxes_totals;
+    }
 }

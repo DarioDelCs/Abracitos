@@ -5,8 +5,8 @@ import edu.upc.epsevg.prop.othello.GameStatus;
 import java.util.Random;
 
 /**
- *
- * @author Dario
+ * Clase per generar la taula de hash
+ * @author Dario, Xavi
  */
 public class ZobristHashing {
 
@@ -14,8 +14,6 @@ public class ZobristHashing {
     private final HashInfo[] zobrist;
     private final int[][][] tablero; //3 posicions, una per el jugador, una per el contrincant, i una per l'empty
     
-    private final HashInfo[] vector_auxiliar;
-
     private final int moviment_jugador1;
     
     /**
@@ -26,7 +24,6 @@ public class ZobristHashing {
         this.mida_hash = mida_hash;
         this.zobrist = new HashInfo[mida_hash];
         this.tablero = new int[8][8][3];
-        this.vector_auxiliar = new HashInfo[1];
         
         Random rand = new Random();
         
@@ -53,7 +50,7 @@ public class ZobristHashing {
         
         //actualitzarem sempre que en aquella posicio de la taula no hi hagui res o el node que hi havia tingues menys fills que l'actual
 //        if(numero total fiches > que la que hi ha guardada actualitza)
-        if (map_info == null || map_info.getProfunditat() <= hash_info.getProfunditat()){
+        if (map_info == null || map_info.getFitxesTotals() < hash_info.getFitxesTotals() || map_info.getProfunditat() <= hash_info.getProfunditat()){
             this.zobrist[index] = hash_info;
         }
     }

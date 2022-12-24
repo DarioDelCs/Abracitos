@@ -3,7 +3,7 @@ package edu.upc.epsevg.prop.othello;
 import edu.upc.epsevg.prop.othello.players.DesdemonaPlayer;
 import edu.upc.epsevg.prop.othello.players.RandomPlayer;
 import edu.upc.epsevg.prop.othello.players.abracitos.PlayerID;
-import edu.upc.epsevg.prop.othello.players.abracitos.PlayerMinimax;
+import edu.upc.epsevg.prop.othello.players.abracitos.PlayerMinima;
 
 
 import javax.swing.SwingUtilities;
@@ -27,7 +27,7 @@ public class Game {
 //                  IPlayer player1 = new Abracitos_IDS_anillo();
 //                IPlayer player1 = new Abracitos_IDS_Hash_pruebas("winner", 2);
 //                IPlayer player1 = new HumanPlayer("Human1");
-                IPlayer player1 = new PlayerMinimax(8);
+                IPlayer player1 = new PlayerMinima(2);
                 IPlayer player2 = new DesdemonaPlayer(1);//GB
 //                IPlayer player2 = new RandomPlayer("Random");
 

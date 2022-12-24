@@ -13,7 +13,7 @@ import java.util.ArrayList;
  * Clase amb profunditat maxima on s'implamenta el robot per guanyar al othello
  * @author Dario, Xavi
  */
-public class PlayerMinimax implements IPlayer, IAuto {
+public class PlayerMinima implements IPlayer, IAuto {
 
     private String name;
     
@@ -27,7 +27,7 @@ public class PlayerMinimax implements IPlayer, IAuto {
      * Constructor de la clase
      * @param profunditat profunditat a la que arribara el minimax
      */
-    public PlayerMinimax(int profunditat) {
+    public PlayerMinima(int profunditat) {
         this.name = "Abracitos";
         this.profunditat = profunditat;
     }
